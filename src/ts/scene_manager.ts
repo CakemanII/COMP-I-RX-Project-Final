@@ -9,16 +9,11 @@ class SceneManager {
     // Mapping of scene names to their order/index
     private readonly SCENE_ORDER: { [key: string]: number } = {
         "Scene0": 0,
-        "Scene1": 1,
-        "Scene2": 2,
-        "Scene3": 3,
-        "Scene4": 4
     };
 
     // Mapping of Indexes to scene IFRAME IDs.
     private readonly SCENE_IFRAME_IDS: { [key: number]: string } = {
         0: "scene-0-iframe",
-        1: "scene-1-iframe",
     };
 
     // Mapping of indexes to scene IFRAME ELements
@@ -26,6 +21,7 @@ class SceneManager {
 
     // Current active scene index
     private currentSceneIndex: number = 0;
+    public get CURRENT_SCENE_INDEX(): number { return this.currentSceneIndex; }
 
     constructor() {
         // Ensure singleton instance
@@ -34,11 +30,15 @@ class SceneManager {
         }
         SceneManager.instance = this;
 
-        // Initialize scene IFRAME elements
-        this.initializeIFrameReferences();
-
-        // Load the initial scene
-        this.loadScene("Scene0");
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            window.addEventListener("DOMContentLoaded", () => {
+                this.initializeIFrameReferences();
+            });
+        } else {
+            // DOM already loaded
+            this.initializeIFrameReferences();
+        }
     }
 
     /**
@@ -61,10 +61,35 @@ class SceneManager {
     }
 
     /**
+     * Wait for all iframes to finish loading their content.
+     */
+    public async waitForIFramesToLoad(): Promise<void> {
+        const loadPromises: Promise<void>[] = [];
+        
+        for (const index in this.sceneIframes) {
+            const iframe = this.sceneIframes[index];
+            
+            // Check if iframe is already loaded
+            if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+                continue;
+            }
+            
+            // Create a promise that resolves when the iframe loads
+            const loadPromise = new Promise<void>((resolve) => {
+                iframe.addEventListener('load', () => resolve(), { once: true });
+            });
+            
+            loadPromises.push(loadPromise);
+        }
+        
+        await Promise.all(loadPromises);
+    }
+
+    /**
      * Load a specific scene from the DOM, unloading all other scenes.
      * @param sceneName - Name of the scene to load
      */
-    private loadScene(sceneName: string): void {
+    public loadScene(sceneName: string): void {
         // Get the scene index from the mapping
         const sceneIndex = this.SCENE_ORDER[sceneName];
 
@@ -73,9 +98,6 @@ class SceneManager {
             console.error(`Scene "${sceneName}" does not exist.`);
             return;
         }
-
-        // Unload all other scenes
-        this.unloadAllScenes();
 
         // Show the requested scene's IFRAME element
         const iframeElement = this.sceneIframes[sceneIndex];
@@ -87,6 +109,12 @@ class SceneManager {
             console.error(`IFRAME for scene "${sceneName}" not found.`);
             return;
         }
+
+        // Unload all other scenes
+        this.unloadAllScenes();
+
+        // Get and set the current scene information
+        UIManager.INSTANCE.sceneChanged();
     }
 
     /**
@@ -108,7 +136,58 @@ class SceneManager {
             iframeElement.style.display = "none";
         }
     }
-}
 
-// Initialize the Scene Manager singleton
-new SceneManager();
+    /**
+     * Get all scene UI information by querying each scene IFRAME.
+     */
+    public async getAllSceneUIInformations(): Promise<any[]> {
+        // Wait for all iframes to be loaded
+        await this.waitForIFramesToLoad();
+        
+        const sceneInfoPromises: Promise<any>[] = [];
+        // Iterate through all scene IFRAMEs
+        for (const index in this.sceneIframes) {
+            // Get the window of the IFRAME
+            const iframeElement = this.sceneIframes[index];
+            const iframeWindow = iframeElement.contentWindow;
+            // Ensure the IFRAME window exists
+            if (!iframeWindow) {
+                console.error(`Cannot access contentWindow for IFRAME of scene index: ${index}`);
+                continue;
+            }
+            // Send message and wait for response
+            const sceneInfoPromise = this.sendAndWaitToReceiveMessage(iframeWindow, "GET_INFO");
+            sceneInfoPromises.push(sceneInfoPromise);
+        }
+        return Promise.all(sceneInfoPromises);
+    }
+
+    /**
+     * Send a message to the specified IFRAME window and wait for a response, then return that response.
+     */
+    private async sendAndWaitToReceiveMessage(iframeWindow: Window, message: string): Promise<any> {
+        // For secure transfer of information, generate a unique transfer ID
+        const secureTransferID: string = Math.random().toString(36).substr(2, 9);
+
+        return new Promise((resolve) => {
+            // Setup Listening for the response message
+            const listener = (event: MessageEvent) => {
+                // Ensure the message is from the expected IFRAME
+                if (event.source !== iframeWindow) {
+                    return;
+                }
+                const messageData = event.data;
+                // Check if the message has the matching transfer ID
+                if (messageData && messageData.secureTransferID === secureTransferID) {
+                    resolve(messageData);
+                    // Remove the event listener after receiving the info
+                    window.removeEventListener("message", listener);
+                }
+            };
+            window.addEventListener("message", listener);
+
+            // Post the message to the IFRAME with the transfer ID
+            iframeWindow.postMessage({ type: message, secureTransferID: secureTransferID }, "*");
+        });
+    }
+}
