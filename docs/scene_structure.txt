@@ -1,0 +1,8 @@
+A scene has:
+- Background Image (800 x 500)
+- "Highlight" buttons that allow user to interact with the environment.
+- When a highlight button is pressed:
+	- Overlay for shows up.
+		- Overlays can have images, text, etc.
+	- Scene can change.
+
