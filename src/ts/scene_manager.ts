@@ -101,17 +101,17 @@ class SceneManager {
 
         // Show the requested scene's IFRAME element
         const iframeElement = this.sceneIframes[sceneIndex];
-        if (iframeElement) {
-            iframeElement.style.display = "block";
-            this.currentSceneIndex = sceneIndex;
-            console.log(`Loaded scene: ${sceneName}`);
-        } else {
-            console.error(`IFRAME for scene "${sceneName}" not found.`);
+        if (!iframeElement) {
+            console.error(`Cannot show IFRAME for scene: ${sceneName}`);
             return;
         }
 
         // Unload all other scenes
         this.unloadAllScenes();
+        
+        // Load the requested scene
+        iframeElement.style.display = "block";
+        this.currentSceneIndex = sceneIndex;
 
         // Get and set the current scene information
         UIManager.INSTANCE.sceneChanged();
