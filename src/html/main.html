@@ -21,6 +21,7 @@
             display: flex;
             flex-direction: column;
             background: linear-gradient(135deg, #e0f7fa 0%, #b3e5fc 100%);
+            font-size: clamp(14px, 1vw + 10px, 16px);
         }
 
         .app-container {
@@ -33,11 +34,11 @@
 
         .app-header {
             text-align: center;
-            font-size: 32px;
+            font-size: clamp(22px, 2vw + 16px, 32px);
             font-weight: 700;
             color: #006064;
             background: linear-gradient(90deg, #00acc1 0%, #0097a7 100%);
-            padding: 16px;
+            padding: clamp(12px, 1vw + 10px, 18px);
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 96, 100, 0.2);
             color: white;
@@ -47,7 +48,7 @@
         .app-main {
             display: grid;
             grid-template-columns: 1fr 280px;
-            gap: 16px;
+            gap: clamp(10px, 1vw + 8px, 16px);
             flex: 1;
             min-height: 0;
         }
@@ -55,7 +56,7 @@
         .scene-panel {
             background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: clamp(14px, 1vw + 12px, 20px);
             display: flex;
             flex-direction: column;
             box-shadow: 0 6px 20px rgba(0, 96, 100, 0.15);
@@ -63,7 +64,7 @@
 
         .scene-title {
             font-weight: 700;
-            font-size: 20px;
+            font-size: clamp(16px, 1vw + 14px, 20px);
             color: #00838f;
             margin-bottom: 12px;
             padding-bottom: 8px;
@@ -71,39 +72,52 @@
         }
 
         .scene-description {
-            font-size: 15px;
+            font-size: clamp(13px, 0.6vw + 12px, 15px);
             line-height: 1.6;
             color: #455a64;
             margin-bottom: 16px;
         }
 
-        .scene-iframe-wrapper {
+        .scene-outer-iframe-wrapper {
             flex: 1;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2f1 100%);
-            border: 2px solid #80deea;
+            min-height: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            color: #00838f;
-            font-weight: 600;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Inner wrapper at native size; we scale it via JS so the entire iframe content (including buttons) scales. */
+        .scene-inner-iframe-wrapper {
+            position: absolute;
+            width: 993px;
+            height: 558px;
+            left: 50%;
+            top: 50%;
+            border-radius: clamp(6px, 1vw + 4px, 8px);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2f1 100%);
+            border: 2px solid #80deea;
             box-shadow: inset 0 2px 8px rgba(0, 131, 143, 0.1);
-            max-width: 993px;
+            overflow: hidden;
+            transform-origin: center center;
+            transition: all 0.2s ease;
         }
 
         .scene-iframe {
-            width:100%; 
-            height:100%; 
-            border:none;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
             border-radius: 8px;
-            overflow: hidden;
+            transform-origin: center center;
         }
 
         .directory-panel {
             background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: clamp(14px, 1vw + 12px, 20px);
             width: 280px;
             display: flex;
             flex-direction: column;
@@ -112,7 +126,7 @@
 
         .directory-title {
             font-weight: 700;
-            font-size: 18px;
+            font-size: clamp(15px, 1vw + 12px, 18px);
             text-align: center;
             color: #00838f;
             margin-bottom: 16px;
@@ -122,12 +136,12 @@
 
         .directory-list {
             list-style: none;
-            font-size: 15px;
+            font-size: clamp(13px, 0.6vw + 12px, 15px);
         }
 
         .directory-list li {
             margin-bottom: 12px;
-            padding: 10px 12px;
+            padding: clamp(8px, 0.6vw + 6px, 10px) clamp(10px, 0.8vw + 8px, 12px);
             border-radius: 6px;
             transition: all 0.2s ease;
         }
@@ -159,10 +173,10 @@
 
         .nav-button {
             border: none;
-            padding: 12px 28px;
+            padding: clamp(10px, 1vw + 8px, 14px) clamp(22px, 2vw + 16px, 28px);
             font-weight: 700;
-            font-size: 16px;
-            border-radius: 8px;
+            font-size: clamp(14px, 0.8vw + 12px, 16px);
+            border-radius: clamp(6px, 0.8vw + 4px, 8px);
             transition: all 0.3s ease;
         }
 
@@ -192,7 +206,7 @@
         .progress-bar-container {
             flex: 1;
             border-radius: 20px;
-            height: 36px;
+            height: clamp(28px, 1vw + 24px, 36px);
             background-color: #e0f2f1;
             overflow: hidden;
             box-shadow: inset 0 2px 6px rgba(0, 96, 100, 0.1);
@@ -206,6 +220,16 @@
             transition: width 0.4s ease;
             box-shadow: 0 0 10px rgba(0, 172, 193, 0.5);
         }
+
+        @media (max-width: 900px) {
+            .app-main {
+                grid-template-columns: 1fr;
+            }
+
+            .directory-panel {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -218,9 +242,11 @@
                 <p class="scene-description" id="scene-description">
 
                 </p>
-                <div class="scene-iframe-wrapper">
-                    <!-- All IFRAME Elements (They're Preloaded into the DOM) -->
-                    <iframe id="scene-0-iframe" src="scene0.html" class="scene-iframe" style="display: none"></iframe>
+                <div class="scene-outer-iframe-wrapper">
+                    <div class="scene-inner-iframe-wrapper">
+                        <!-- All IFRAME Elements (They're Preloaded into the DOM) -->
+                        <iframe id="scene-0-iframe" src="scene0.html" class="scene-iframe" style="display: none"></iframe>
+                    </div>
                 </div>
             </section>
 
@@ -245,5 +271,28 @@
     <script src="../compiled_js/scene_manager.js"></script>
     <script src="../compiled_js/ui_manager.js"></script>
     <script src="../compiled_js/manager.js"></script>
+    
+    <script>
+        // Scale the inner wrapper (and all iframe contents) using transform for smooth, dynamic resizing.
+        function scaleIframeWrapper() {
+            const outer = document.querySelector('.scene-outer-iframe-wrapper');
+            const inner = document.querySelector('.scene-inner-iframe-wrapper');
+            if (!outer || !inner) return;
+
+            const outerRect = outer.getBoundingClientRect();
+            const baseWidth = 993;
+            const baseHeight = 558;
+
+            const scaleX = outerRect.width / baseWidth;
+            const scaleY = outerRect.height / baseHeight;
+            const scale = Math.min(scaleX, scaleY);
+
+            inner.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        }
+
+        window.addEventListener('load', scaleIframeWrapper);
+        window.addEventListener('resize', scaleIframeWrapper);
+        setTimeout(scaleIframeWrapper, 50);
+    </script>
 </body>
 </html>

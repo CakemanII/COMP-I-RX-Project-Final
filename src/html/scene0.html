@@ -21,25 +21,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: transparent;
-        }
-
-        .scene-container {
-            position: relative;
-            width: 993px;
-            height: 558px;
-            max-width: 100%;
-            max-height: 100%;
-            margin: auto;
         }
         
         img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
             user-select: none;
             -webkit-user-drag: none;
             pointer-events: none;
+        }
+
+        .scene-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
 
         .circular-button {
