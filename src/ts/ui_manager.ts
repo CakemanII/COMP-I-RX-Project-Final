@@ -22,6 +22,9 @@ class UIManager {
     // Scene UIs
     private sceneUIs: any[] = [];
 
+    private currentMaxProgress: number = 0;
+    private currentProgress: number = 0;
+
     constructor() {
         // Ensure singleton instance
         if (UIManager.instance) {
@@ -92,16 +95,25 @@ class UIManager {
         const sceneUI = this.sceneUIs[sceneIndex];
         this.sceneTitleElement.textContent = `${sceneUI.sceneName}`;
         this.sceneDescriptionElement.textContent = sceneUI.description;
+        this.currentMaxProgress = sceneUI.maxProgress;
     }
-
 
     /**
      * Set the progress bar value.
      */
-    private setProgressBarValue(value: number, maxValue: number)
+    private setProgressBarValue(value: number): void
     {
-        const percentage = (value / maxValue) * 100;
-        console.log(`Setting progress bar to ${percentage}%`);
+        const percentage = (value / this.currentMaxProgress) * 100;
         this.progressBarFillElement.style.width = `${percentage}%`;
+    }
+
+    /**
+     * Update the progress bar by one step.
+     */
+    public incrementProgressBar(): void
+    {
+        // Increment current value
+        this.currentProgress++;
+        this.setProgressBarValue(this.currentProgress);
     }
 }

@@ -30,6 +30,9 @@ class SceneManager {
         }
         SceneManager.instance = this;
 
+        // Initialize communication
+        this.initializeProgressUpdateCommunication();
+
         // Initialize when DOM is ready
         if (document.readyState === 'loading') {
             window.addEventListener("DOMContentLoaded", () => {
@@ -58,6 +61,19 @@ class SceneManager {
             // Store the IFRAME element in the mapping
             this.sceneIframes[Number(index)] = iframeElement;
         }
+    }
+
+    /**
+     * Initialize progress update communication
+     */
+    private initializeProgressUpdateCommunication(): void {
+        window.addEventListener("message", (event: MessageEvent) => {
+            const messageData = event.data;
+            if (messageData && messageData.type === "PROGRESS_UPDATE") {
+                // Update the progress bar in the UI Manager
+                UIManager.INSTANCE.incrementProgressBar();
+            }
+        });
     }
 
     /**

@@ -6,6 +6,9 @@ abstract class Scene {
     protected abstract sceneName: string
     protected abstract description: string;
 
+    protected abstract maxProgress: number;
+    protected abstract sceneObjectives: { [key: string]: boolean };
+
     constructor() {
         this.initializeCommunication();
     }
@@ -27,14 +30,63 @@ abstract class Scene {
             if (message.type === "GET_INFO") {
                 // Respond with scene information
                 const sceneInfo = {
-                    directoryHeader: "Introduction",
-                    sceneName: "Test 1",
-                    description: "Test info"
+                    directoryHeader: this.directoryHeader,
+                    sceneName: this.sceneName,
+                    description: this.description,
+                    maxProgress: this.maxProgress
                 };
                 // Post the message back to the parent window with the secureTransferID
                 window.parent.postMessage({ ...sceneInfo, secureTransferID: message.secureTransferID }, "*");
             }
         });
+    }
+
+    /**
+     * Disable interactions within the scene
+     */
+    public disableInteractions(): void {
+        // Disable all circular buttons
+        const buttons = document.querySelectorAll('.circular-button');
+        buttons.forEach((button) => {
+            (button as HTMLElement).style.pointerEvents = 'none';
+            (button as HTMLElement).style.opacity = '0.5';
+        });
+    }
+
+    /**
+     * Enable interactions within the scene
+     */
+    public enableInteractions(): void {
+        // Enable all circular buttons
+        const buttons = document.querySelectorAll('.circular-button');
+        buttons.forEach((button) => {
+            (button as HTMLElement).style.pointerEvents = 'auto';
+            (button as HTMLElement).style.opacity = '1';
+        });
+    }
+
+    /**
+     * Update objectives and scene progress
+     */
+    protected updateObjectivesAndProgress(objective: string): void {
+        if (!this.sceneObjectives.hasOwnProperty(objective)) {
+            console.warn(`Objective "${objective}" does not exist in the scene objectives.`);
+            return;
+        }
+
+        // Mark the objective as completed
+        if (this.sceneObjectives[objective] === true) { return; } // Already completed
+        this.sceneObjectives[objective] = true;
+
+        // Notify Scene Manager to increment progress bar
+        this.sendProgressUpdate();
+    }
+
+    /**
+     * Communicate to Scene Manager to increment progress bar
+     */
+    private sendProgressUpdate(): void {
+        window.parent.postMessage({ type: "PROGRESS_UPDATE" }, "*");
     }
 }
 
