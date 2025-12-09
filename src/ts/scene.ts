@@ -96,6 +96,14 @@ abstract class Scene {
             (button as HTMLElement).style.pointerEvents = 'none';
             (button as HTMLElement).style.opacity = '0.5';
         });
+
+        // Disable all draggable items
+        const draggables = document.querySelectorAll('.draggable-item');
+        draggables.forEach((draggable) => {
+            (draggable as HTMLElement).style.pointerEvents = 'none';
+            (draggable as HTMLElement).style.opacity = '0.5';
+            (draggable as HTMLElement).style.cursor = 'not-allowed';
+        });
     }
 
     /**
@@ -107,6 +115,20 @@ abstract class Scene {
         buttons.forEach((button) => {
             (button as HTMLElement).style.pointerEvents = 'auto';
             (button as HTMLElement).style.opacity = '1';
+        });
+
+        // Enable all draggable items
+        const draggables = document.querySelectorAll('.draggable-item');
+        draggables.forEach((draggable) => {
+            const el = draggable as HTMLElement;
+            // Check if this item was permanently disabled (correctly placed)
+            const isPermanentlyDisabled = el.getAttribute('data-permanently-disabled') === 'true';
+            
+            if (!isPermanentlyDisabled) {
+                el.style.pointerEvents = 'auto';
+                el.style.opacity = '1';
+                el.style.cursor = 'grab';
+            }
         });
     }
 
@@ -509,6 +531,7 @@ class DraggableElement {
         this.element.style.cursor = 'not-allowed';
         this.element.style.opacity = '0.5';
         this.element.style.pointerEvents = 'none';
+        this.element.setAttribute('data-permanently-disabled', 'true');
     }
 
     /**
@@ -518,6 +541,7 @@ class DraggableElement {
         this.element.style.cursor = 'grab';
         this.element.style.opacity = '1';
         this.element.style.pointerEvents = 'auto';
+        this.element.removeAttribute('data-permanently-disabled');
     }
 }
 
