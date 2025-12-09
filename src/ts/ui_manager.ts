@@ -21,6 +21,7 @@ class UIManager {
 
     // Scene UIs
     private sceneUIs: any[] = [];
+    private directoryItems: HTMLElement[] = [];
     private finishedInitializing: boolean = false;
 
     private currentMaxProgress: number = -1;
@@ -108,9 +109,27 @@ class UIManager {
         directoryItems.forEach((item, index) => {
             const listItem = document.createElement("li");
             listItem.classList.add("directory-current");
-            listItem.textContent = `${index}: ${item.directoryHeader}`;
+            listItem.textContent = `${index+1}: ${item.directoryHeader}`;
+            
+            // Add click handler for directory navigation
+            listItem.addEventListener('click', () => {
+                Manager.INSTANCE.goToScene(index);
+            });
+            
             this.directoryElement.appendChild(listItem);
+            this.directoryItems.push(listItem);
         });
+
+        // Set first item as active and unlocked initially
+        if (this.directoryItems.length > 0) {
+            this.directoryItems[0].classList.add("directory-active");
+            this.directoryItems[0].classList.add("directory-unlocked");
+        }
+
+        // Lock all other scenes initially
+        for (let i = 1; i < this.directoryItems.length; i++) {
+            this.directoryItems[i].classList.add("directory-locked");
+        }
 
         this.finishedInitializing = true;
     }
@@ -130,6 +149,37 @@ class UIManager {
     public async sceneChanged(): Promise<void> {        
         const sceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
         this.setSceneTitleAndDescription(sceneIndex);
+        this.updateDirectoryActiveState(sceneIndex);
+    }
+
+    /**
+     * Update which directory item has the active class
+     */
+    private updateDirectoryActiveState(sceneIndex: number): void {
+        // Remove active class from all items
+        this.directoryItems.forEach(item => {
+            item.classList.remove("directory-active");
+        });
+
+        // Add active class to current scene
+        if (sceneIndex >= 0 && sceneIndex < this.directoryItems.length) {
+            this.directoryItems[sceneIndex].classList.add("directory-active");
+        }
+    }
+
+    /**
+     * Update directory item accessibility based on completed scenes
+     */
+    public updateDirectoryAccessibility(): void {
+        this.directoryItems.forEach((item, index) => {
+            if (Manager.INSTANCE.isSceneAccessible(index)) {
+                item.classList.remove("directory-locked");
+                item.classList.add("directory-unlocked");
+            } else {
+                item.classList.remove("directory-unlocked");
+                item.classList.add("directory-locked");
+            }
+        });
     }
 
     /**

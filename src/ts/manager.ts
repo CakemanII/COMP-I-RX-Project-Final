@@ -99,7 +99,32 @@ class Manager {
                 this.maxCompletedSceneIndex = currentSceneIndex;
             }
             this.updateNavigationButtons();
+            UIManager.INSTANCE.updateDirectoryAccessibility();
         }
+    }
+
+    /**
+     * Check if a scene is accessible (completed scenes + next unlocked scene)
+     */
+    public isSceneAccessible(sceneIndex: number): boolean {
+        // Allow access to completed scenes and the next scene after completion
+        return sceneIndex <= this.maxCompletedSceneIndex + 1;
+    }
+
+    /**
+     * Navigate to a specific scene by index
+     */
+    public async goToScene(sceneIndex: number): Promise<void> {
+        const currentSceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
+        
+        // Don't navigate if it's the current scene or if scene is not accessible
+        if (sceneIndex === currentSceneIndex || !this.isSceneAccessible(sceneIndex)) {
+            return;
+        }
+
+        await SceneManager.INSTANCE.loadSceneByIndex(sceneIndex);
+        this.loadProgressForScene();
+        this.updateNavigationButtons();
     }
 
     /**
