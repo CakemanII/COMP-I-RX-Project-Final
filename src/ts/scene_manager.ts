@@ -16,6 +16,10 @@ class SceneManager {
         0: "scene-0-iframe",
     };
 
+    // All IFRAMES loaded flag
+    private allIFramesLoaded: boolean = false;
+    public get ALL_IFRAMES_LOADED(): boolean { return this.allIFramesLoaded; }
+
     // Mapping of indexes to scene IFRAME ELements
     private sceneIframes: { [key: number]: HTMLIFrameElement } = {};
 
@@ -30,18 +34,43 @@ class SceneManager {
         }
         SceneManager.instance = this;
 
-        // Initialize communication
-        this.initializeProgressUpdateCommunication();
-
         // Initialize when DOM is ready
         if (document.readyState === 'loading') {
-            window.addEventListener("DOMContentLoaded", () => {
-                this.initializeIFrameReferences();
-            });
+            window.addEventListener("DOMContentLoaded", () => { this.init(); });
         } else {
-            // DOM already loaded
-            this.initializeIFrameReferences();
+            this.init();
         }
+    }
+
+    /**
+     * Get total number of scenes
+     */
+    public getTotalSceneCount(): number {
+        return Object.keys(this.SCENE_ORDER).length;
+    }
+
+    /**
+     * Load a scene by its index
+     */
+    public async loadSceneByIndex(index: number): Promise<void> {
+        // Find scene name by index
+        for (const sceneName in this.SCENE_ORDER) {
+            if (this.SCENE_ORDER[sceneName] === index) {
+                await this.loadScene(sceneName);
+                return;
+            }
+        }
+        console.error(`No scene found for index: ${index}`);
+    }
+
+    /**
+     * Initialize the SceneManager after DOM is ready
+     */
+    private init(): void {
+        // DOM already loaded
+        this.initializeIFrameReferences();
+        // Wait for all iframes to be loaded
+        this.waitForIFramesToLoad();
     }
 
     /**
@@ -64,41 +93,46 @@ class SceneManager {
     }
 
     /**
-     * Initialize progress update communication
+     * Wait to receive a message from all IFRAMEs indicating they have loaded
      */
-    private initializeProgressUpdateCommunication(): void {
-        window.addEventListener("message", (event: MessageEvent) => {
+    private async waitForIFramesToLoad(): Promise<void> {
+        // Get total number of IFRAMEs to wait for
+        const totalIFrames = Object.keys(this.sceneIframes).length;
+        let loadedIFrames: Window[] = [];
+
+        // Setup message listener for IFRAME loaded messages
+        const listener = (event: MessageEvent) => {
             const messageData = event.data;
-            if (messageData && messageData.type === "PROGRESS_UPDATE") {
-                // Update the progress bar in the UI Manager
-                UIManager.INSTANCE.incrementProgressBar();
+            if (messageData && messageData.type === "SCENE_LOADED") {
+                if (loadedIFrames.includes(messageData.window)) { return; } // Already recorded
+                loadedIFrames.push(messageData.window);
+                console.log(`Received IFRAME_LOADED message. Total loaded: ${loadedIFrames.length} / ${totalIFrames}`);
+                // Send acknowledgment message back to the IFRAME
+                (event.source as Window).postMessage({ type: "SCENE_LOAD_OK" }, "*");
             }
-        });
+        };
+
+        // Add the event listener
+        window.addEventListener("message", listener);
+
+        // Wait until all IFRAMEs have reported loaded
+        while (loadedIFrames.length < totalIFrames) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        // All IFRAMEs have loaded
+        this.allIFramesLoaded = true;
+        console.log("All IFRAMEs have reported loaded.");
     }
 
     /**
-     * Wait for all iframes to finish loading their content.
+     * Wait until all scene IFRAMEs have loaded
      */
-    public async waitForIFramesToLoad(): Promise<void> {
-        const loadPromises: Promise<void>[] = [];
-        
-        for (const index in this.sceneIframes) {
-            const iframe = this.sceneIframes[index];
-            
-            // Check if iframe is already loaded
-            if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
-                continue;
-            }
-            
-            // Create a promise that resolves when the iframe loads
-            const loadPromise = new Promise<void>((resolve) => {
-                iframe.addEventListener('load', () => resolve(), { once: true });
-            });
-            
-            loadPromises.push(loadPromise);
+    public async waitForAllIFramesToLoad(): Promise<void> {
+        while (!this.allIFramesLoaded) {
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
-        
-        await Promise.all(loadPromises);
+        console.log("All scene IFRAMEs have loaded!!!");
     }
 
     /**
@@ -156,11 +190,13 @@ class SceneManager {
     /**
      * Get all scene UI information by querying each scene IFRAME.
      */
-    public async getAllSceneUIInformations(): Promise<any[]> {
-        // Wait for all iframes to be loaded
-        await this.waitForIFramesToLoad();
+    public async getAllSceneUIInformations(): Promise<any[]> {      
+        // Wait until all IFRAMEs have loaded
+        while (!this.ALL_IFRAMES_LOADED) 
+            { await new Promise(resolve => setTimeout(resolve, 100)); }
+
+        const sceneUIInformations: any[] = [];
         
-        const sceneInfoPromises: Promise<any>[] = [];
         // Iterate through all scene IFRAMEs
         for (const index in this.sceneIframes) {
             // Get the window of the IFRAME
@@ -172,10 +208,11 @@ class SceneManager {
                 continue;
             }
             // Send message and wait for response
-            const sceneInfoPromise = this.sendAndWaitToReceiveMessage(iframeWindow, "GET_INFO");
-            sceneInfoPromises.push(sceneInfoPromise);
+            const sceneInfo = await this.sendAndWaitToReceiveMessage(iframeWindow, "GET_INFO");
+            sceneUIInformations.push(sceneInfo);
         }
-        return Promise.all(sceneInfoPromises);
+
+        return sceneUIInformations;
     }
 
     /**

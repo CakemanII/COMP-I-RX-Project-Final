@@ -5,6 +5,12 @@ class Manager {
     private static instance: Manager;
     public static get INSTANCE(): Manager { return this.instance; }
 
+    private maxCompletedSceneIndex: number = 0;
+    private currentProgress: number = 0;
+    
+    private backButton!: HTMLElement;
+    private nextButton!: HTMLElement;
+
     constructor() {
         // Ensure singleton instance
         if (Manager.instance) {
@@ -18,13 +24,139 @@ class Manager {
 
         // Wait for DOM and IFRAME contents to finish loading
         window.addEventListener("DOMContentLoaded", async () => {
-            await SceneManager.INSTANCE.waitForIFramesToLoad();
-            // Wait a bit for UI initialization
-            await new Promise(resolve => setTimeout(resolve, 100));
+            this.initializeNavigationButtons();
+            this.initializeProgressUpdateCommunication();
+
+            // Wait for all IFRAMEs to load
+            await SceneManager.INSTANCE.waitForAllIFramesToLoad();
+
+            // Wait for UIManager to initialize
+            await UIManager.INSTANCE.waitForInitialization();
+            
             // Load the initial scene
-            console.log("Loading Scene 0");
             SceneManager.INSTANCE.loadScene("Scene0");
+            this.updateNavigationButtons();
         });
+    }
+
+    /**
+     * Initialize navigation button references and click handlers
+     */
+    private initializeNavigationButtons(): void {
+        const navButtons = document.querySelectorAll('.nav-button');
+        this.backButton = navButtons[0] as HTMLElement;
+        this.nextButton = navButtons[1] as HTMLElement;
+
+        // Back button click handler
+        this.backButton.addEventListener('click', () => {
+            if (this.backButton.classList.contains('clickable')) {
+                this.goToPreviousScene();
+            }
+        });
+
+        // Next button click handler
+        this.nextButton.addEventListener('click', () => {
+            if (this.nextButton.classList.contains('clickable')) {
+                this.goToNextScene();
+            }
+        });
+    }
+
+    /**
+     * Initialize progress update communication from scenes
+     */
+    private initializeProgressUpdateCommunication(): void {
+        window.addEventListener("message", (event: MessageEvent) => {
+            const messageData = event.data;
+            if (messageData && messageData.type === "PROGRESS_UPDATE") {
+                this.incrementProgress();
+            }
+        });
+    }
+
+    /**
+     * Increment scene progress and update UI
+     */
+    private async incrementProgress(): Promise<void> {
+        // Ensure UI is initialized before accessing scene data
+        await UIManager.INSTANCE.waitForInitialization();
+        
+        this.currentProgress++;
+        const currentSceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
+        const maxProgress = UIManager.INSTANCE.getCurrentSceneMaxProgress();
+        
+        // Update progress bar with current value and max
+        UIManager.INSTANCE.setProgressBarValue(this.currentProgress, maxProgress);
+        
+        // Check if scene is completed
+        if (this.currentProgress >= maxProgress) {
+            // Mark this scene as completed
+            if (currentSceneIndex > this.maxCompletedSceneIndex) {
+                this.maxCompletedSceneIndex = currentSceneIndex;
+            }
+            this.updateNavigationButtons();
+        }
+    }
+
+    /**
+     * Update navigation button states based on current scene
+     */
+    private updateNavigationButtons(): void {
+        const currentSceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
+        const totalScenes = SceneManager.INSTANCE.getTotalSceneCount();
+
+        // Back button: active if not on first scene
+        if (currentSceneIndex > 0) {
+            this.backButton.classList.remove('not-clickable');
+            this.backButton.classList.add('clickable');
+        } else {
+            this.backButton.classList.remove('clickable');
+            this.backButton.classList.add('not-clickable');
+        }
+
+        // Next button: active if current scene is completed or if we can go forward
+        if (this.maxCompletedSceneIndex >= currentSceneIndex && currentSceneIndex < totalScenes - 1) {
+            this.nextButton.classList.remove('not-clickable');
+            this.nextButton.classList.add('clickable');
+        } else {
+            this.nextButton.classList.remove('clickable');
+            this.nextButton.classList.add('not-clickable');
+        }
+    }
+
+    /**
+     * Go to the previous scene
+     */
+    private async goToPreviousScene(): Promise<void> {
+        const currentSceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
+        if (currentSceneIndex > 0) {
+            await SceneManager.INSTANCE.loadSceneByIndex(currentSceneIndex - 1);
+            this.resetProgressForScene();
+            this.updateNavigationButtons();
+        }
+    }
+
+    /**
+     * Go to the next scene
+     */
+    private async goToNextScene(): Promise<void> {
+        const currentSceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
+        const totalScenes = SceneManager.INSTANCE.getTotalSceneCount();
+        
+        if (currentSceneIndex < totalScenes - 1 && this.maxCompletedSceneIndex >= currentSceneIndex) {
+            await SceneManager.INSTANCE.loadSceneByIndex(currentSceneIndex + 1);
+            this.resetProgressForScene();
+            this.updateNavigationButtons();
+        }
+    }
+
+    /**
+     * Reset progress counter for new scene
+     */
+    private resetProgressForScene(): void {
+        this.currentProgress = 0;
+        const maxProgress = UIManager.INSTANCE.getCurrentSceneMaxProgress();
+        UIManager.INSTANCE.setProgressBarValue(0, maxProgress);
     }
 }
 

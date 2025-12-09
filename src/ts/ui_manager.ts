@@ -21,9 +21,9 @@ class UIManager {
 
     // Scene UIs
     private sceneUIs: any[] = [];
+    private finishedInitializing: boolean = false;
 
-    private currentMaxProgress: number = 0;
-    private currentProgress: number = 0;
+    private currentMaxProgress: number = -1;
 
     constructor() {
         // Ensure singleton instance
@@ -34,14 +34,53 @@ class UIManager {
 
         // Initialize when DOM is ready
         if (document.readyState === 'loading') {
-            window.addEventListener("DOMContentLoaded", () => {
+            window.addEventListener("DOMContentLoaded", async () => {
                 this.initializeReferences();
                 this.initializeSceneUIs();
+                this.listenForAudioPermissionRequest();                
             });
         } else {
             // DOM already loaded
             this.initializeReferences();
             this.initializeSceneUIs();
+            this.listenForAudioPermissionRequest();
+        }
+    }
+
+    /**
+     * Listen for audio permission request from iframe
+     */
+    private listenForAudioPermissionRequest(): void {
+        window.addEventListener("message", (event) => {
+            if (event.data.type === "AUDIO_PERMISSION_NEEDED") {
+                this.showAudioPermissionPrompt();
+            } else if (event.data.type === "PLAY_AUDIO") {
+                // Forward play audio message to the current scene iframe
+                const currentIframe = document.getElementById(`scene-${SceneManager.INSTANCE.CURRENT_SCENE_INDEX}-iframe`) as HTMLIFrameElement;
+                if (currentIframe && currentIframe.contentWindow) {
+                    currentIframe.contentWindow.postMessage({ type: "PLAY_AUDIO" }, "*");
+                }
+            }
+        });
+    }
+
+    /**
+     * Show audio permission prompt overlay
+     */
+    private showAudioPermissionPrompt(): void {
+        const overlay = document.getElementById("audio-permission-overlay");
+        if (overlay) {
+            overlay.style.display = "flex";
+        }
+    }
+
+    /**
+     * Hide audio permission prompt overlay
+     */
+    public hideAudioPermissionPrompt(): void {
+        const overlay = document.getElementById("audio-permission-overlay");
+        if (overlay) {
+            overlay.style.display = "none";
         }
     }
 
@@ -72,12 +111,23 @@ class UIManager {
             listItem.textContent = `${index}: ${item.directoryHeader}`;
             this.directoryElement.appendChild(listItem);
         });
+
+        this.finishedInitializing = true;
+    }
+
+    /**
+     * Wait for UIManager to finish initialization
+     */
+    public async waitForInitialization(): Promise<void> {
+        while (!this.finishedInitializing) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
     }
 
     /**
      * Triggered when the scene is changed.
      */
-    public sceneChanged(): void {
+    public async sceneChanged(): Promise<void> {        
         const sceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
         this.setSceneTitleAndDescription(sceneIndex);
     }
@@ -99,21 +149,22 @@ class UIManager {
     }
 
     /**
-     * Set the progress bar value.
+     * Get the current scene's max progress value
      */
-    private setProgressBarValue(value: number): void
-    {
-        const percentage = (value / this.currentMaxProgress) * 100;
-        this.progressBarFillElement.style.width = `${percentage}%`;
+    public getCurrentSceneMaxProgress(): number {
+        if (this.currentMaxProgress < 0) {
+            console.warn("getCurrentSceneMaxProgress called before scene is loaded");
+            return 0;
+        }
+        return this.currentMaxProgress;
     }
 
     /**
-     * Update the progress bar by one step.
+     * Set the progress bar value.
      */
-    public incrementProgressBar(): void
+    public setProgressBarValue(value: number, maxValue: number): void
     {
-        // Increment current value
-        this.currentProgress++;
-        this.setProgressBarValue(this.currentProgress);
+        const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+        this.progressBarFillElement.style.width = `${percentage}%`;
     }
 }

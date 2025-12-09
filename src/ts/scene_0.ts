@@ -6,12 +6,14 @@ class Scene0 extends Scene {
     protected sceneName: string = "Test 1"
     protected description: string = "Test info";
 
-    protected maxProgress: number = 4;
+    protected maxProgress: number = 6;
     protected sceneObjectives: { [key: string]: boolean } = {
         "infoBox1Viewed": false,
         "infoBox2Viewed": false,
         "infoBox3Viewed": false,
-        "infoBox4Viewed": false
+        "infoBox4Viewed": false,
+        "dragTask1Completed": false,
+        "dragTask2Completed": false
     }
 
     private infoBoxes: HTMLElement[] = [];
@@ -19,6 +21,7 @@ class Scene0 extends Scene {
     constructor() {
         super();
         this.initializeButtons();
+        this.initializeDragAndDrop();
     }
 
     /**
@@ -47,10 +50,10 @@ class Scene0 extends Scene {
         ]
 
         // Initialize buttons with example callbacks
-        new SingleClickButton("button-1", () => { this.buttonClicked(0); });
-        new SingleClickButton("button-2", () => { this.buttonClicked(1); });
-        new SingleClickButton("button-3", () => { this.buttonClicked(2); });
-        new SingleClickButton("button-4", () => { this.buttonClicked(3); });
+        new SingleClickButton("button-1", true, () => { this.buttonClicked(0); });
+        new SingleClickButton("button-2", true, () => { this.buttonClicked(1); });
+        new SingleClickButton("button-3", true, () => { this.buttonClicked(2); });
+        new SingleClickButton("button-4", true, () => { this.buttonClicked(3); });
     }
 
     /**
@@ -58,11 +61,75 @@ class Scene0 extends Scene {
      */
     private buttonClicked(button_index: number): void {
         console.log(`Button ${button_index} clicked!`);
-        const infoBox = this.infoBoxes[button_index];
 
+        // Toggle info box visibility
+        const infoBox = this.infoBoxes[button_index];
         this.hideAllInfoBoxes(infoBox);
-        this.updateObjectivesAndProgress(`infoBox${button_index + 1}Viewed`);
+
+        // Toggle visibility
         infoBox.classList.toggle("visible");
+
+        // Do not continue if not visible or already viewed
+        if (
+            !infoBox.classList.contains("visible") || 
+            this.sceneObjectives[`infoBox${button_index + 1}Viewed`] === true
+        ) { return; }
+
+        // Disable Interactions
+        this.disableInteractions();
+
+        // Play audio if clicking for the first time
+        this.audioPlayer.setAudioElement(
+            "narration-one",
+            [],
+            () => { 
+                this.enableInteractions();
+                this.updateObjectivesAndProgress(`infoBox${button_index + 1}Viewed`);
+            }  // Re-enable interactions after audio ends
+        );
+        this.audioPlayer.play();
+    }
+
+    /**
+     * Initialize drag and drop example
+     */
+    private initializeDragAndDrop(): void {
+        // Create draggable elements
+        const draggableItem1 = new DraggableElement("drag-item-1");
+        const draggableItem2 = new DraggableElement("drag-item-2");
+
+        // Both items participate in both zones
+        const allDraggables = [draggableItem1, draggableItem2];
+
+        // Create drop zone 1 (accepts item 1)
+        const dropZone1 = new DraggablePlaceSpot(
+            "drop-zone-1",
+            allDraggables,
+            draggableItem1,
+            () => {
+                console.log("Correct! Red item placed in Zone A.");
+                this.updateObjectivesAndProgress("dragTask1Completed");
+            },
+            () => {
+                console.log("Incorrect placement. Try again!");
+            }
+        );
+        dropZone1.setSnapRadius(80);
+
+        // Create drop zone 2 (accepts item 2)
+        const dropZone2 = new DraggablePlaceSpot(
+            "drop-zone-2",
+            allDraggables,
+            draggableItem2,
+            () => {
+                console.log("Correct! Teal item placed in Zone B.");
+                this.updateObjectivesAndProgress("dragTask2Completed");
+            },
+            () => {
+                console.log("Incorrect placement. Try again!");
+            }
+        );
+        dropZone2.setSnapRadius(80);
     }
 }
 
