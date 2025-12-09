@@ -161,10 +161,18 @@ class UIManager {
 
     /**
      * Set the progress bar value.
+     * @param animate If true, animates the progress bar transition. If false, updates instantly.
      */
-    public setProgressBarValue(value: number, maxValue: number): void
+    public setProgressBarValue(value: number, maxValue: number, animate: boolean = true): void
     {
         const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+        
+        if (animate) {
+            this.progressBarFillElement.style.transition = 'width 0.3s ease';
+        } else {
+            this.progressBarFillElement.style.transition = 'none';
+        }
+        
         this.progressBarFillElement.style.width = `${percentage}%`;
     }
 }

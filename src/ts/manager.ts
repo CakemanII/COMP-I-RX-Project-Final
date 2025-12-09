@@ -5,8 +5,9 @@ class Manager {
     private static instance: Manager;
     public static get INSTANCE(): Manager { return this.instance; }
 
-    private maxCompletedSceneIndex: number = 0;
+    private maxCompletedSceneIndex: number = -1;
     private currentProgress: number = 0;
+    private sceneProgressMap: Map<number, number> = new Map();
     
     private backButton!: HTMLElement;
     private nextButton!: HTMLElement;
@@ -85,8 +86,11 @@ class Manager {
         const currentSceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
         const maxProgress = UIManager.INSTANCE.getCurrentSceneMaxProgress();
         
-        // Update progress bar with current value and max
-        UIManager.INSTANCE.setProgressBarValue(this.currentProgress, maxProgress);
+        // Store progress for this scene
+        this.sceneProgressMap.set(currentSceneIndex, this.currentProgress);
+        
+        // Update progress bar with current value and max (with animation)
+        UIManager.INSTANCE.setProgressBarValue(this.currentProgress, maxProgress, true);
         
         // Check if scene is completed
         if (this.currentProgress >= maxProgress) {
@@ -131,7 +135,7 @@ class Manager {
         const currentSceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
         if (currentSceneIndex > 0) {
             await SceneManager.INSTANCE.loadSceneByIndex(currentSceneIndex - 1);
-            this.resetProgressForScene();
+            this.loadProgressForScene();
             this.updateNavigationButtons();
         }
     }
@@ -145,18 +149,23 @@ class Manager {
         
         if (currentSceneIndex < totalScenes - 1 && this.maxCompletedSceneIndex >= currentSceneIndex) {
             await SceneManager.INSTANCE.loadSceneByIndex(currentSceneIndex + 1);
-            this.resetProgressForScene();
+            this.loadProgressForScene();
             this.updateNavigationButtons();
         }
     }
 
     /**
-     * Reset progress counter for new scene
+     * Load saved progress for current scene
      */
-    private resetProgressForScene(): void {
-        this.currentProgress = 0;
+    private loadProgressForScene(): void {
+        const currentSceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
         const maxProgress = UIManager.INSTANCE.getCurrentSceneMaxProgress();
-        UIManager.INSTANCE.setProgressBarValue(0, maxProgress);
+        
+        // Get saved progress for this scene, default to 0 if not found
+        this.currentProgress = this.sceneProgressMap.get(currentSceneIndex) || 0;
+        
+        // Update progress bar with saved progress (no animation when switching scenes)
+        UIManager.INSTANCE.setProgressBarValue(this.currentProgress, maxProgress, false);
     }
 }
 

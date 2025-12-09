@@ -37,9 +37,11 @@ abstract class Scene {
      */
     private sendInitializationFinishedBeacon(): void {
         // Send becon that scene is loaded
+        const uniqueID = Math.random().toString(36).substring(2) + Date.now().toString(36);
         const interval = setInterval(() => {
             // Notify parent window that scene has loaded
-            window.parent.postMessage({ type: "SCENE_LOADED" }, "*");
+            console.log("Sending SCENE_LOADED beacon to Scene Manager.");
+            window.parent.postMessage({ uniqueID: uniqueID, type: "SCENE_LOADED" }, "*");
         }, 100);
 
         // Stop sending beacon after receiving an OK from parent

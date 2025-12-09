@@ -9,11 +9,13 @@ class SceneManager {
     // Mapping of scene names to their order/index
     private readonly SCENE_ORDER: { [key: string]: number } = {
         "Scene0": 0,
+        "Scene1": 1,
     };
 
     // Mapping of Indexes to scene IFRAME IDs.
     private readonly SCENE_IFRAME_IDS: { [key: number]: string } = {
         0: "scene-0-iframe",
+        1: "scene-1-iframe",
     };
 
     // All IFRAMES loaded flag
@@ -104,8 +106,8 @@ class SceneManager {
         const listener = (event: MessageEvent) => {
             const messageData = event.data;
             if (messageData && messageData.type === "SCENE_LOADED") {
-                if (loadedIFrames.includes(messageData.window)) { return; } // Already recorded
-                loadedIFrames.push(messageData.window);
+                if (loadedIFrames.includes(messageData.uniqueID)) { return; } // Already recorded
+                loadedIFrames.push(messageData.uniqueID);
                 console.log(`Received IFRAME_LOADED message. Total loaded: ${loadedIFrames.length} / ${totalIFrames}`);
                 // Send acknowledgment message back to the IFRAME
                 (event.source as Window).postMessage({ type: "SCENE_LOAD_OK" }, "*");
