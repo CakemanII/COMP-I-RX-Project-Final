@@ -82,6 +82,59 @@
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(0, 172, 193, 0);
             }
         }
+
+        .info-box {
+            position: absolute;
+            display: none;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border: 3px solid #00acc1;
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 220px;
+            max-width: 300px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            z-index: 20;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #006064;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .info-box.visible {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .info-box h3 {
+            margin: 0 0 8px 0;
+            color: #00838f;
+            font-size: 16px;
+            font-weight: 700;
+            border-bottom: 2px solid #00acc1;
+            padding-bottom: 6px;
+        }
+
+        .info-box p {
+            margin: 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -93,6 +146,24 @@
         <div id="button-2" class="circular-button pulse" style="top: 167px; left: 546px;">+</div>
         <div id="button-3" class="circular-button pulse" style="top: 390px; left: 179px;">+</div>
         <div id="button-4" class="circular-button pulse" style="top: 379px; left: 616px;">+</div>
+
+        <!-- Info Box for Button 1 -->
+        <div id="info-box-1" class="info-box" style="top: 208px; left: 230px;">
+            <h3>Information Point 1</h3>
+            <p>This is detailed information about this location. Click the button again to close this box.</p>
+        </div>
+        <div id="info-box-2" class="info-box" style="top: 152px; left: 627px;">
+            <h3>Information Point 2</h3>
+            <p>This is detailed information about this location. Click the button again to close this box.</p>
+        </div>
+        <div id="info-box-3" class="info-box" style="top: 375px; left: 260px;">
+            <h3>Information Point 3</h3>
+            <p>This is detailed information about this location. Click the button again to close this box.</p>
+        </div>
+        <div id="info-box-4" class="info-box" style="top: 364px; left: 697px;">
+            <h3>Information Point 4</h3>
+            <p>This is detailed information about this location. Click the button again to close this box.</p>
+        </div>
     </div>
     
     <!-- Scripts -->

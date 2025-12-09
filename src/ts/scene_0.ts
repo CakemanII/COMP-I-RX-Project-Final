@@ -8,99 +8,61 @@ class Scene0 extends Scene {
 
     constructor() {
         super();
+        this.initializeButtons();
     }
-}
 
-class Button {
-    private element: HTMLElement;
-    private isEnabled: boolean = true;
+    private hideAllInfoBoxes(exception: HTMLElement | null = null): void {
+        const infoBoxes = document.querySelectorAll(".info-box");
+        infoBoxes.forEach(
+            box => {
+                if (box !== exception) 
+                {
+                    box.classList.remove("visible")
+                }
+        });
+    }
 
-    constructor(elementID: string, onClick: () => void) {
-        // Get the button element
-        const buttonElement = document.getElementById(elementID);
-        if (!buttonElement) {
-            throw new Error(`Button element with ID "${elementID}" not found.`);
-        }
-        this.element = buttonElement;
+    private initializeButtons(): void {
+        // Get info box element
+        const infoBox1 = document.getElementById("info-box-1");
+        const infoBox2 = document.getElementById("info-box-2");
+        const infoBox3 = document.getElementById("info-box-3");
+        const infoBox4 = document.getElementById("info-box-4");
 
-        // Attach click event listener
-        this.element.addEventListener("click", () => {
-            if (this.isEnabled) {
-                this.createRipple();
-                onClick();
+        // Initialize buttons with example callbacks
+        new SingleClickButton("button-1", () => {
+            console.log("Button 1 clicked!");
+            if (infoBox1) {
+                this.hideAllInfoBoxes(infoBox1);
+                infoBox1.classList.toggle("visible");
             }
         });
 
-        // Remove pulse animation on first hover
-        this.element.addEventListener("mouseenter", () => {
-            this.element.classList.remove("pulse");
-        }, { once: true });
-    }
+        new SingleClickButton("button-2", () => {
+            console.log("Button 2 clicked!");
+            if (infoBox2) {
+                this.hideAllInfoBoxes(infoBox2);
+                infoBox2.classList.toggle("visible");
+            }
+        });
 
-    /**
-     * Create a ripple effect when button is clicked
-     */
-    private createRipple(): void {
-        const ripple = document.createElement("div");
-        ripple.style.position = "absolute";
-        ripple.style.width = "100%";
-        ripple.style.height = "100%";
-        ripple.style.borderRadius = "50%";
-        ripple.style.background = "rgba(255, 255, 255, 0.6)";
-        ripple.style.transform = "scale(0)";
-        ripple.style.animation = "ripple 0.6s ease-out";
-        ripple.style.pointerEvents = "none";
+        new SingleClickButton("button-3", () => {
+            console.log("Button 3 clicked!");
+            if (infoBox3) {
+                this.hideAllInfoBoxes(infoBox3);
+                infoBox3.classList.toggle("visible");
+            }
+        });
 
-        this.element.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 600);
-    }
-
-    /**
-     * Enable or disable the button
-     */
-    public setEnabled(enabled: boolean): void {
-        this.isEnabled = enabled;
-        if (enabled) {
-            this.element.style.opacity = "1";
-            this.element.style.cursor = "pointer";
-        } else {
-            this.element.style.opacity = "0.5";
-            this.element.style.cursor = "not-allowed";
-        }
-    }
-
-    /**
-     * Hide the button
-     */
-    public hide(): void {
-        this.element.style.display = "none";
-    }
-
-    /**
-     * Show the button
-     */
-    public show(): void {
-        this.element.style.display = "flex";
+        new SingleClickButton("button-4", () => {
+            console.log("Button 4 clicked!");
+            if (infoBox4) {
+                this.hideAllInfoBoxes(infoBox4);
+                infoBox4.classList.toggle("visible");
+            }
+        });
     }
 }
 
-// Add ripple animation to document
-const style = document.createElement("style");
-style.textContent = `
-    @keyframes ripple {
-        to {
-            transform: scale(2);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
-
 // Initialize the scene
 new Scene0();
-
-// Initialize buttons with example callbacks
-new Button("button-1", () => console.log("Button 1 clicked!"));
-new Button("button-2", () => console.log("Button 2 clicked!"));
-new Button("button-3", () => console.log("Button 3 clicked!"));
-new Button("button-4", () => console.log("Button 4 clicked!"));
