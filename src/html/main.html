@@ -64,18 +64,14 @@
 
         .scene-title {
             font-weight: 700;
-            font-size: clamp(16px, 1vw + 14px, 20px);
+            font-size: clamp(18px, 1.5vw + 14px, 26px);
             color: #00838f;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 3px solid #00acc1;
-        }
-
-        .scene-description {
-            font-size: clamp(13px, 0.6vw + 12px, 15px);
-            line-height: 1.6;
-            color: #455a64;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #00acc1;
+            align-self: center;
+            display: flex;
+            justify-content: center;
         }
 
         .scene-outer-iframe-wrapper {
@@ -320,7 +316,7 @@
         <main class="app-main">
             <section class="scene-panel">
                 <div class="scene-title" id="scene-title"></div>
-                <p class="scene-description" id="scene-description">
+                <p style="margin-bottom: 16px;">
 
                 </p>
                 <div class="scene-outer-iframe-wrapper">

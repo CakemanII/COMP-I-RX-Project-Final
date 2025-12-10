@@ -2,134 +2,55 @@
  * Start Menu
  */
 class Scene0 extends Scene {
-    protected directoryHeader: string = "Introduction";
-    protected sceneName: string = "Test 1"
-    protected description: string = "Test info";
+    protected directoryHeader: string = "Welcome";
+    protected sceneName: string = "Welcome to the Tampa Bay Rising Sea Levels Interactive Experience"
 
-    protected maxProgress: number = 6;
+    protected maxProgress: number = 1;
     protected sceneObjectives: { [key: string]: boolean } = {
-        "infoBox1Viewed": false,
-        "infoBox2Viewed": false,
-        "infoBox3Viewed": false,
-        "infoBox4Viewed": false,
-        "dragTask1Completed": false,
-        "dragTask2Completed": false
+        "main-narrator-completed": false,
     }
-
-    private infoBoxes: HTMLElement[] = [];
 
     constructor() {
         super();
-        this.initializeButtons();
-        this.initializeDragAndDrop();
+
+        this.setupAudioPlaying();
+        this.audioPlayer.play()
     }
 
-    /**
-     * Hide all info boxes except the exception
+    /** 
+     * Setup the audio to play after user interaction
      */
-    private hideAllInfoBoxes(exception: HTMLElement | null = null): void {
-        const infoBoxes = document.querySelectorAll(".info-box");
-        infoBoxes.forEach(box => {
-            if (box !== exception) 
-            {
-                box.classList.remove("visible")
-            }
-        });
-    }
+    private setupAudioPlaying(): void {
+        // Get additional elements
+        const infoBox1 = document.getElementById("info-box-1")!;
+        const spaceBarImage = document.getElementById("space-bar-image")!;
 
-    /**
-     * Initialize the scene buttons and their callbacks.
-     */
-    private initializeButtons(): void {
-        // Get info box element
-        this.infoBoxes = [
-            document.getElementById("info-box-1")!,
-            document.getElementById("info-box-2")!,
-            document.getElementById("info-box-3")!,
-            document.getElementById("info-box-4")!
-        ]
-
-        // Initialize buttons with example callbacks
-        new SingleClickButton("button-1", true, () => { this.buttonClicked(0); });
-        new SingleClickButton("button-2", true, () => { this.buttonClicked(1); });
-        new SingleClickButton("button-3", true, () => { this.buttonClicked(2); });
-        new SingleClickButton("button-4", true, () => { this.buttonClicked(3); });
-    }
-
-    /**
-     * Button clicked
-     */
-    private buttonClicked(button_index: number): void {
-        console.log(`Button ${button_index} clicked!`);
-
-        // Toggle info box visibility
-        const infoBox = this.infoBoxes[button_index];
-        this.hideAllInfoBoxes(infoBox);
-
-        // Toggle visibility
-        infoBox.classList.toggle("visible");
-
-        // Do not continue if not visible or already viewed
-        if (
-            !infoBox.classList.contains("visible") || 
-            this.sceneObjectives[`infoBox${button_index + 1}Viewed`] === true
-        ) { return; }
-
-        // Disable Interactions
-        this.disableInteractions();
-
-        // Play audio if clicking for the first time
         this.audioPlayer.setAudioElement(
-            "narration-one",
-            [],
-            () => { 
-                this.enableInteractions();
-                this.updateObjectivesAndProgress(`infoBox${button_index + 1}Viewed`);
-            }  // Re-enable interactions after audio ends
-        );
-        this.audioPlayer.play();
-    }
-
-    /**
-     * Initialize drag and drop example
-     */
-    private initializeDragAndDrop(): void {
-        // Create draggable elements
-        const draggableItem1 = new DraggableElement("drag-item-1");
-        const draggableItem2 = new DraggableElement("drag-item-2");
-
-        // Both items participate in both zones
-        const allDraggables = [draggableItem1, draggableItem2];
-
-        // Create drop zone 1 (accepts item 1)
-        const dropZone1 = new DraggablePlaceSpot(
-            "drop-zone-1",
-            allDraggables,
-            draggableItem1,
+            "initial-narration", 
+            [
+                {
+                    timestamp: 9.5,
+                    callback: () => {
+                        infoBox1.classList.add("visible");
+                    }
+                },
+                {
+                    timestamp: 24.0,
+                    callback: () => {
+                        // image about tasks to do.
+                    }
+                },
+                {
+                    timestamp: 32.0,
+                    callback: () => {
+                        spaceBarImage.classList.add("visible");
+                    }
+                }
+            ],
             () => {
-                console.log("Correct! Red item placed in Zone A.");
-                this.updateObjectivesAndProgress("dragTask1Completed");
-            },
-            () => {
-                console.log("Incorrect placement. Try again!");
+                this.updateObjectivesAndProgress("main-narrator-completed");
             }
-        );
-        dropZone1.setSnapRadius(80);
-
-        // Create drop zone 2 (accepts item 2)
-        const dropZone2 = new DraggablePlaceSpot(
-            "drop-zone-2",
-            allDraggables,
-            draggableItem2,
-            () => {
-                console.log("Correct! Teal item placed in Zone B.");
-                this.updateObjectivesAndProgress("dragTask2Completed");
-            },
-            () => {
-                console.log("Incorrect placement. Try again!");
-            }
-        );
-        dropZone2.setSnapRadius(80);
+        )
     }
 }
 

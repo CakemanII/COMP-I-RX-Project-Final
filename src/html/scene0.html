@@ -118,6 +118,27 @@
             margin: 0;
         }
 
+        .info-box ul,
+        .info-box ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .info-box ul li,
+        .info-box ol li {
+            margin: 6px 0;
+            line-height: 1.6;
+        }
+
+        .info-box ul li::marker {
+            color: #00acc1;
+        }
+
+        .info-box ol li::marker {
+            color: #00acc1;
+            font-weight: 600;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -208,52 +229,52 @@
             pointer-events: none;
             white-space: nowrap;
         }
+
+        /* Image Box */
+        .image-box {
+            position: absolute;
+            display: none;
+            border-radius: 12px;
+            z-index: 25;
+            pointer-events: none;
+        }
+
+        .image-box.visible {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
     <div class="scene-container">
         <img src="../media/scene_0/background.png" alt="Scene 0">
-        
-        <!-- Circular Buttons -->
-        <div id="button-1" class="circular-button pulse" style="top: 223px; left: 149px;">+</div>
-        <div id="button-2" class="circular-button pulse" style="top: 167px; left: 546px;">+</div>
-        <div id="button-3" class="circular-button pulse" style="top: 390px; left: 179px;">+</div>
-        <div id="button-4" class="circular-button pulse" style="top: 379px; left: 616px;">+</div>
 
         <!-- Info Box for Button 1 -->
-        <div id="info-box-1" class="info-box" style="top: 208px; left: 230px;">
-            <h3>Information Point 1</h3>
-            <p>This is detailed information about this location. Click the button again to close this box.</p>
-        </div>
-        <div id="info-box-2" class="info-box" style="top: 152px; left: 627px;">
-            <h3>Information Point 2</h3>
-            <p>This is detailed information about this location. Click the button again to close this box.</p>
-        </div>
-        <div id="info-box-3" class="info-box" style="top: 375px; left: 260px;">
-            <h3>Information Point 3</h3>
-            <p>This is detailed information about this location. Click the button again to close this box.</p>
-        </div>
-        <div id="info-box-4" class="info-box" style="top: 364px; left: 697px;">
-            <h3>Information Point 4</h3>
-            <p>This is detailed information about this location. Click the button again to close this box.</p>
+        <div id="info-box-1" class="info-box" style="top: 50px; left: 50px;">
+            <h3>About this Lesson</h3>
+            <p>We will be learning about: </p>
+            <ul>
+                <li>What makes sea / water levels rise?</li>
+                <li>How are ecosystems being harmed in the Tampa Bay?</li>
+                <li>What solutions could be implemented to stop this?</li>
+                <li>What can I do to help save Tampa Bay?</li>
+            </ul>
         </div>
 
-        <!-- Drag and Drop Example -->
-        <div id="drag-item-1" class="draggable-item" style="top: 50px; left: 50px;">
-            Red
-        </div>
-        <div id="drag-item-2" class="draggable-item" style="top: 150px; left: 50px;">
-            Teal
-        </div>
-        <div id="drop-zone-1" class="drop-zone" style="top: 50px; left: 300px;">
-            Zone A
-        </div>
-        <div id="drop-zone-2" class="drop-zone" style="top: 150px; left: 300px;">
-            Zone B
+        <!-- Space Bar Image -->
+        <div id="space-bar-image" class="image-box" style="top: 100px; right: 150px; width: 350px;">
+            <img src="../media/scene_0/space_bar.jpg" alt="Space Bar">
         </div>
     </div>
 
-    <audio id="narration-one" src="../media/scene_0/demo_audio_test.mp3"></audio>
+    <audio id="initial-narration" src="../media/scene_0/scene_1_narration.mp3"></audio>
     
     <!-- Scripts -->
      <script src="../compiled_js/scene.js"></script>

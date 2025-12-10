@@ -16,9 +16,6 @@ class UIManager {
     private readonly SCENE_TITLE_ID: string = "scene-title";
     private sceneTitleElement!: HTMLElement;
 
-    private readonly SCENE_DESCRIPTION_ID: string = "scene-description";
-    private sceneDescriptionElement!: HTMLElement;
-
     // Scene UIs
     private sceneUIs: any[] = [];
     private directoryItems: HTMLElement[] = [];
@@ -92,7 +89,6 @@ class UIManager {
         this.directoryElement = document.getElementById(this.DIRECTORY_ID)!;
         this.progressBarFillElement = document.getElementById(this.PROGRESS_BAR_FILL_ID)!;
         this.sceneTitleElement = document.getElementById(this.SCENE_TITLE_ID)!;
-        this.sceneDescriptionElement = document.getElementById(this.SCENE_DESCRIPTION_ID)!;
     }
 
     /**
@@ -148,7 +144,7 @@ class UIManager {
      */
     public async sceneChanged(): Promise<void> {        
         const sceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
-        this.setSceneTitleAndDescription(sceneIndex);
+        this.setSceneTitle(sceneIndex);
         this.updateDirectoryActiveState(sceneIndex);
     }
 
@@ -185,7 +181,7 @@ class UIManager {
     /**
      * Update the scene title and description in the UI.
      */
-    private setSceneTitleAndDescription(sceneIndex: number): void {
+    private setSceneTitle(sceneIndex: number): void {
         if (sceneIndex < 0 || sceneIndex >= this.sceneUIs.length) {
             console.error(`Invalid scene index: ${sceneIndex}`);
             return;
@@ -194,7 +190,6 @@ class UIManager {
         // Get and set the scene UI information
         const sceneUI = this.sceneUIs[sceneIndex];
         this.sceneTitleElement.textContent = `${sceneUI.sceneName}`;
-        this.sceneDescriptionElement.textContent = sceneUI.description;
         this.currentMaxProgress = sceneUI.maxProgress;
     }
 

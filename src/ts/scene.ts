@@ -3,8 +3,7 @@
  */
 abstract class Scene {
     protected abstract directoryHeader: string;
-    protected abstract sceneName: string
-    protected abstract description: string;
+    protected abstract sceneName: string;
 
     protected abstract maxProgress: number;
     protected abstract sceneObjectives: { [key: string]: boolean };
@@ -17,16 +16,6 @@ abstract class Scene {
 
         // Initialize the audio player
         this.audioPlayer = new SceneAudioPlayer();
-        this.audioPlayer.setAudioElement("narration-one", [], () => {
-            console.log("Audio narration finished.");
-        });
-
-        // Attempt to play audio (may be blocked by browser autoplay policy)
-        this.audioPlayer.play().catch(err => {
-            console.log("Autoplay prevented. Requesting parent to prompt user.");
-            // Notify parent window to show audio permission prompt
-            window.parent.postMessage({ type: "AUDIO_PERMISSION_NEEDED" }, "*");
-        });
 
         // Send initialization finished beacon
         this.sendInitializationFinishedBeacon();
@@ -72,16 +61,12 @@ abstract class Scene {
                 const sceneInfo = {
                     directoryHeader: this.directoryHeader,
                     sceneName: this.sceneName,
-                    description: this.description,
                     maxProgress: this.maxProgress
                 };
                 // Post the message back to the parent window with the secureTransferID
                 window.parent.postMessage({ ...sceneInfo, secureTransferID: message.secureTransferID }, "*");
             } else if (message.type === "PLAY_AUDIO") {
-                // Retry playing audio after user permission
-                this.audioPlayer.play().catch(err => {
-                    console.warn("Audio playback still blocked after permission:", err);
-                });
+                this.audioPlayer.play(); // ?
             }
         });
     }
@@ -397,7 +382,7 @@ class SceneAudioPlayer {
     /**
      * Play the audio
      */
-    public async play(): Promise<void> {
+    private async _play(): Promise<void> {
         if (!this.audioElement) { 
             console.warn("Cannot play, Audio element not set."); 
             return Promise.reject("Audio element not set");
@@ -408,6 +393,18 @@ class SceneAudioPlayer {
             console.warn("Audio play failed:", error);
             throw error;
         }
+    }
+
+    /**
+     * Public method to play audio with error handling
+     */
+    public play(): void {
+        // Attempt to play audio (may be blocked by browser autoplay policy)
+        this._play().catch(err => {
+            console.log("Autoplay prevented. Requesting parent to prompt user.");
+            // Notify parent window to show audio permission prompt
+            window.parent.postMessage({ type: "AUDIO_PERMISSION_NEEDED" }, "*");
+        });
     }
 
     /**

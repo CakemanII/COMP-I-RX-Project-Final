@@ -4,7 +4,6 @@
 class Scene1 extends Scene {
     protected directoryHeader: string = "Introduction";
     protected sceneName: string = "Test 2"
-    protected description: string = "Test info";
 
     protected maxProgress: number = 6;
     protected sceneObjectives: { [key: string]: boolean } = {
