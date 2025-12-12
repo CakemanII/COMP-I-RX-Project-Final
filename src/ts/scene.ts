@@ -5,7 +5,7 @@ abstract class Scene {
     protected abstract directoryHeader: string;
     protected abstract sceneName: string;
 
-    protected abstract maxProgress: number;
+    protected maxProgress: number = -1;
     protected abstract sceneObjectives: { [key: string]: boolean };
 
     protected audioPlayer: SceneAudioPlayer;
@@ -217,6 +217,74 @@ class SingleClickButton {
      */
     public show(): void {
         this.element.style.display = "flex";
+    }
+}
+
+/**
+ * Dialogue Overlay Element
+ */
+class DialogueOverlay {
+    private overlayElement: HTMLElement;
+    private closeButton: HTMLElement;
+    
+    private can_exit: boolean = true;
+    private escapeHandler: ((e: KeyboardEvent) => void) | null = null;
+
+    constructor(overlayID: string) {
+        // Get the overlay element
+        const overlay = document.getElementById(overlayID);
+        if (!overlay) {
+            throw new Error(`Dialogue overlay element with ID "${overlayID}" not found.`);
+        }
+        this.overlayElement = overlay;
+
+        // Get child elements
+        const closeBtn = overlay.querySelector("#dialogue-close") as HTMLElement;
+        if (!closeBtn) {
+            throw new Error("Dialogue close button with ID 'dialogue-close' not found.");
+        }
+        this.closeButton = closeBtn;
+
+        // Setup close button click handler
+        this.closeButton.onclick = () => { if (this.can_exit) this.hide(); }
+    }
+
+    /**
+     * Show the dialogue overlay with content
+     */
+    public show(): void {
+        // Display overlay
+        this.overlayElement.style.display = "flex";
+        this.overlayElement.classList.add("visible");
+
+        // Setup escape key listener
+        this.escapeHandler = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && this.can_exit) {
+                this.hide();
+            }
+        };
+        document.addEventListener("keydown", this.escapeHandler);
+    }
+
+    /**
+     * Hide the dialogue overlay
+     */
+    public hide(): void {
+        this.overlayElement.style.display = "none";
+        this.overlayElement.classList.remove("visible");
+
+        // Remove escape key listener
+        if (this.escapeHandler) {
+            document.removeEventListener("keydown", this.escapeHandler);
+            this.escapeHandler = null;
+        }
+    }
+
+    /**
+     * Set whether the overlay can be exited
+     */
+    public setCanExit(canExit: boolean): void {
+        this.can_exit = canExit;
     }
 }
 

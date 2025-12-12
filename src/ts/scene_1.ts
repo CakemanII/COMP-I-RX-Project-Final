@@ -2,133 +2,148 @@
  * Start Menu
  */
 class Scene1 extends Scene {
-    protected directoryHeader: string = "Introduction";
-    protected sceneName: string = "Test 2"
+    protected directoryHeader: string = "Water is Rising?";
+    protected sceneName: string = "What causes sea levels and water levels to rise?"
 
-    protected maxProgress: number = 6;
     protected sceneObjectives: { [key: string]: boolean } = {
-        "infoBox1Viewed": false,
-        "infoBox2Viewed": false,
-        "infoBox3Viewed": false,
-        "infoBox4Viewed": false,
-        "dragTask1Completed": false,
-        "dragTask2Completed": false
+        "intro-narration-completed": false,
+        "dialogue-1-completed": false,
+        "dialogue-2-completed": false,
+        "dialogue-3-completed": false,
+        "dialogue-4-completed": false,
     }
-
-    private infoBoxes: HTMLElement[] = [];
 
     constructor() {
         super();
+        
+        // Set max progress
+        this.maxProgress = Object.keys(this.sceneObjectives).length;
+
+        this.setupAudioPlaying();
+        this.audioPlayer.play()
+
         this.initializeButtons();
-        this.initializeDragAndDrop();
     }
 
-    /**
-     * Hide all info boxes except the exception
-     */
-    private hideAllInfoBoxes(exception: HTMLElement | null = null): void {
-        const infoBoxes = document.querySelectorAll(".info-box");
-        infoBoxes.forEach(box => {
-            if (box !== exception) 
-            {
-                box.classList.remove("visible")
-            }
+    private initializeButtons(): void {
+        new SingleClickButton("question-button-1", true, () => {
+            this.dialogueSequence("dialogue-overlay-1");
+        });
+        new SingleClickButton("question-button-2", true, () => {
+            this.dialogueSequence("dialogue-overlay-2");
+        });
+        new SingleClickButton("question-button-3", true, () => {
+            this.dialogueSequence("dialogue-overlay-3");
+        });
+        new SingleClickButton("question-button-4", true, () => {
+            this.dialogueSequence("dialogue-overlay-4");
         });
     }
 
-    /**
-     * Initialize the scene buttons and their callbacks.
-     */
-    private initializeButtons(): void {
-        // Get info box element
-        this.infoBoxes = [
-            document.getElementById("info-box-1")!,
-            document.getElementById("info-box-2")!,
-            document.getElementById("info-box-3")!,
-            document.getElementById("info-box-4")!
-        ]
+    private dialogueSequence(overlay_id: string) {
+        // Get the dialogue completed objective
+        let dialogueNumber: number = -1;
+        switch (overlay_id) {
+            case "dialogue-overlay-1":
+                dialogueNumber = 1;
+                break;
+            case "dialogue-overlay-2":
+                dialogueNumber = 2;
+                break;
+            case "dialogue-overlay-3":
+                dialogueNumber = 3;
+                break;
+            case "dialogue-overlay-4":
+                dialogueNumber = 4;
+                break;
+            default:
+                console.error(`Invalid dialogue overlay ID: ${overlay_id}`);
+                return;
+        }
 
-        // Initialize buttons with example callbacks
-        new SingleClickButton("button-1", true, () => { this.buttonClicked(0); });
-        new SingleClickButton("button-2", true, () => { this.buttonClicked(1); });
-        new SingleClickButton("button-3", true, () => { this.buttonClicked(2); });
-        new SingleClickButton("button-4", true, () => { this.buttonClicked(3); });
-    }
+        // Set the question mark button to a different image.
+        if (!this.sceneObjectives[`dialogue-${dialogueNumber}-completed`]) {
+            const questionElement = document.getElementById(`question-mark-${dialogueNumber}`) as HTMLButtonElement;    
+            const questionImage = questionElement.querySelector("img") as HTMLImageElement;
+            
+            let image = ""
+            switch (dialogueNumber) {
+                case 1:
+                    image = "../media/scene_1/flooding.jpg";
+                    break;
+                case 2:
+                    image = "../media/scene_1/storm_surge.jpg";
+                    break;
+                case 3:
+                    image = "../media/scene_1/climate_change.jpg";
+                    break;
+                case 4:
+                    image = "../media/scene_1/hurricane.png";
+                    break;
+                default:
+                    console.error(`Invalid dialogue number: ${dialogueNumber}`);
+                    return;
+            }
+            questionImage.src = image;
+        }
 
-    /**
-     * Button clicked
-     */
-    private buttonClicked(button_index: number): void {
-        console.log(`Button ${button_index} clicked!`);
+        // Initialize dialogue overlay
+        const dialogue = new DialogueOverlay(overlay_id);
+        dialogue.setCanExit(false);
+        dialogue.show();
 
-        // Toggle info box visibility
-        const infoBox = this.infoBoxes[button_index];
-        this.hideAllInfoBoxes(infoBox);
+        if (this.sceneObjectives[`dialogue-${dialogueNumber}-completed`]) {
+            dialogue.setCanExit(true);
+            return; // Already completed
+        }
 
-        // Toggle visibility
-        infoBox.classList.toggle("visible");
-
-        // Do not continue if not visible or already viewed
-        if (
-            !infoBox.classList.contains("visible") || 
-            this.sceneObjectives[`infoBox${button_index + 1}Viewed`] === true
-        ) { return; }
-
-        // Disable Interactions
-        this.disableInteractions();
-
-        // Play audio if clicking for the first time
+        // Play the audio
         this.audioPlayer.setAudioElement(
-            "narration-one",
+            `dialogue-narration-${dialogueNumber}`, 
             [],
-            () => { 
-                this.enableInteractions();
-                this.updateObjectivesAndProgress(`infoBox${button_index + 1}Viewed`);
-            }  // Re-enable interactions after audio ends
-        );
+            () => {
+                console.log(`Dialogue ${dialogueNumber} audio completed`);
+                dialogue.setCanExit(true);
+                this.updateObjectivesAndProgress(`dialogue-${dialogueNumber}-completed`);
+            }
+        )
         this.audioPlayer.play();
     }
 
-    /**
-     * Initialize drag and drop example
+    /** 
+     * Setup the audio to play after user interaction
      */
-    private initializeDragAndDrop(): void {
-        // Create draggable elements
-        const draggableItem1 = new DraggableElement("drag-item-1");
-        const draggableItem2 = new DraggableElement("drag-item-2");
+    private setupAudioPlaying(): void {
+        // Get additional elements
+        const infoBox1 = document.getElementById("info-box-1")!;
+        const spaceBarImage = document.getElementById("space-bar-image")!;
 
-        // Both items participate in both zones
-        const allDraggables = [draggableItem1, draggableItem2];
-
-        // Create drop zone 1 (accepts item 1)
-        const dropZone1 = new DraggablePlaceSpot(
-            "drop-zone-1",
-            allDraggables,
-            draggableItem1,
+        this.audioPlayer.setAudioElement(
+            "initial-narration", 
+            [
+                {
+                    timestamp: 9.5,
+                    callback: () => {
+                        infoBox1.classList.add("visible");
+                    }
+                },
+                {
+                    timestamp: 24.0,
+                    callback: () => {
+                        // image about tasks to do.
+                    }
+                },
+                {
+                    timestamp: 32.0,
+                    callback: () => {
+                        spaceBarImage.classList.add("visible");
+                    }
+                }
+            ],
             () => {
-                console.log("Correct! Red item placed in Zone A.");
-                this.updateObjectivesAndProgress("dragTask1Completed");
-            },
-            () => {
-                console.log("Incorrect placement. Try again!");
+                this.updateObjectivesAndProgress("main-narrator-completed");
             }
-        );
-        dropZone1.setSnapRadius(80);
-
-        // Create drop zone 2 (accepts item 2)
-        const dropZone2 = new DraggablePlaceSpot(
-            "drop-zone-2",
-            allDraggables,
-            draggableItem2,
-            () => {
-                console.log("Correct! Teal item placed in Zone B.");
-                this.updateObjectivesAndProgress("dragTask2Completed");
-            },
-            () => {
-                console.log("Incorrect placement. Try again!");
-            }
-        );
-        dropZone2.setSnapRadius(80);
+        )
     }
 }
 

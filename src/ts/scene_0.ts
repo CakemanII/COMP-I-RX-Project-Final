@@ -5,13 +5,15 @@ class Scene0 extends Scene {
     protected directoryHeader: string = "Welcome";
     protected sceneName: string = "Welcome to the Tampa Bay Rising Sea Levels Interactive Experience"
 
-    protected maxProgress: number = 1;
     protected sceneObjectives: { [key: string]: boolean } = {
         "main-narrator-completed": false,
     }
 
     constructor() {
         super();
+
+        // Set max progress
+        this.maxProgress = Object.keys(this.sceneObjectives).length;
 
         this.setupAudioPlaying();
         this.audioPlayer.play()

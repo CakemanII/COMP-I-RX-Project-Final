@@ -4,256 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rising Water Levels Tutorial</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            user-select: none;
-            -webkit-user-drag: none;
-            pointer-events: none;
-        }
-
-        .scene-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .circular-button {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00acc1 0%, #0097a7 100%);
-            border: 4px solid #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(0, 172, 193, 0.4);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 24px;
-            user-select: none;
-            z-index: 10;
-        }
-
-        .circular-button:hover {
-            transform: scale(1.15);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 172, 193, 0.6);
-        }
-
-        .circular-button:active {
-            transform: scale(1.05);
-        }
-
-        .circular-button.pulse {
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(0, 172, 193, 0.4);
-            }
-            50% {
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 15px rgba(0, 172, 193, 0);
-            }
-            100% {
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(0, 172, 193, 0);
-            }
-        }
-
-        .info-box {
-            position: absolute;
-            display: none;
-            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
-            border: 3px solid #00acc1;
-            border-radius: 12px;
-            padding: 16px 20px;
-            min-width: 220px;
-            max-width: 300px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-            z-index: 20;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #006064;
-            line-height: 1.5;
-            font-size: 14px;
-        }
-
-        .info-box.visible {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .info-box h3 {
-            margin: 0 0 8px 0;
-            color: #00838f;
-            font-size: 16px;
-            font-weight: 700;
-            border-bottom: 2px solid #00acc1;
-            padding-bottom: 6px;
-        }
-
-        .info-box p {
-            margin: 0;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes ripple {
-            to {
-                transform: scale(2);
-                opacity: 0;
-            }
-        }
-
-        /* Draggable Elements */
-        .draggable-item {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-            border: 3px solid #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            user-select: none;
-            z-index: 15;
-        }
-
-        .draggable-item:nth-child(6) {
-            background: linear-gradient(135deg, #4ecdc4 0%, #44a7a0 100%);
-        }
-
-        .drop-zone {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            border: 4px solid #ffffff;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #00acc1 0%, #0097a7 100%);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            z-index: 5;
-        }
-
-        .drop-zone::after {
-            content: '';
-            position: absolute;
-            width: 40px;
-            height: 20px;
-            border-left: 5px solid #00ff00;
-            border-bottom: 5px solid #00ff00;
-            transform: rotate(-45deg) translateY(-5px);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .drop-zone.completed::after {
-            opacity: 1;
-        }
-
-        /* Text Prompts */
-        .text-prompt {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 16px;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/scene_styles.css">
 </head>
 <body>
     <div class="scene-container">
-        <img src="../media/scene_0/background.png" alt="Scene 0">
-        
-        <!-- Circular Buttons -->
-        <div id="button-1" class="circular-button pulse" style="top: 223px; left: 149px;">+</div>
-        <div id="button-2" class="circular-button pulse" style="top: 167px; left: 546px;">+</div>
-        <div id="button-3" class="circular-button pulse" style="top: 390px; left: 179px;">+</div>
-        <div id="button-4" class="circular-button pulse" style="top: 379px; left: 616px;">+</div>
+        <img src="../media/scene_1/background_scene_1.jpg" alt="Scene BG">
 
-        <!-- Info Box for Button 1 -->
-        <div id="info-box-1" class="info-box" style="top: 208px; left: 230px;">
-            <h3>Information Point 1</h3>
-            <p>This is detailed information about this location. Click the button again to close this box.</p>
+        <!-- Question Mark Images in 2x2 Grid -->
+        <div id="question-mark-1" class="image-box visible no-animation" style="top: 70px; left: 200px; width: 160px; height: 160px;">
+            <img src="../media/scene_1/question_mark.png" alt="Question Mark">
         </div>
-        <div id="info-box-2" class="info-box" style="top: 152px; left: 627px;">
-            <h3>Information Point 2</h3>
-            <p>This is detailed information about this location. Click the button again to close this box.</p>
+        <div id="question-mark-2" class="image-box visible no-animation" style="top: 70px; right: 200px; width: 160px; height: 160px;">
+            <img src="../media/scene_1/question_mark.png" alt="Question Mark">
         </div>
-        <div id="info-box-3" class="info-box" style="top: 375px; left: 260px;">
-            <h3>Information Point 3</h3>
-            <p>This is detailed information about this location. Click the button again to close this box.</p>
+        <div id="question-mark-3" class="image-box visible no-animation" style="bottom: 70px; left: 200px; width: 160px; height: 160px;">
+            <img src="../media/scene_1/question_mark.png" alt="Question Mark">
         </div>
-        <div id="info-box-4" class="info-box" style="top: 364px; left: 697px;">
-            <h3>Information Point 4</h3>
-            <p>This is detailed information about this location. Click the button again to close this box.</p>
+        <div id="question-mark-4" class="image-box visible no-animation" style="bottom: 70px; right: 200px; width: 160px; height: 160px;">
+            <img src="../media/scene_1/question_mark.png" alt="Question Mark">
         </div>
 
-        <!-- Drag and Drop Example -->
-        <div id="drag-item-1" class="draggable-item" style="top: 50px; left: 50px;">
-            Red
-        </div>
-        <div id="drag-item-2" class="draggable-item" style="top: 150px; left: 50px;">
-            Teal
-        </div>
-        <div id="drop-zone-1" class="drop-zone" style="top: 50px; left: 300px;">
-            Zone A
-        </div>
-        <div id="drop-zone-2" class="drop-zone" style="top: 150px; left: 300px;">
-            Zone B
+        <!-- Invisible Buttons Over Question Marks -->
+        <div id="question-button-1" class="invisible-button" style="top: 70px; left: 200px; width: 160px; height: 160px;"></div>
+        <div id="question-button-2" class="invisible-button" style="top: 70px; right: 200px; width: 160px; height: 160px;"></div>
+        <div id="question-button-3" class="invisible-button" style="bottom: 70px; left: 200px; width: 160px; height: 160px;"></div>
+        <div id="question-button-4" class="invisible-button" style="bottom: 70px; right: 200px; width: 160px; height: 160px;"></div>
+    </div>
+
+    <!-- Dialogue Overlay -->
+    <div id="dialogue-overlay-1" class="dialogue-overlay">
+        <div class="dialogue-container">
+            <button id="dialogue-close" class="dialogue-close-btn">&times;</button>
+            <div class="dialogue-text-section">
+                <h2>Flooding</h2>
+                <ul>
+                    <li>Flooding occurs when water overflows onto normally dry land due to storms, high tides, or rising sea levels.</li>
+                    
+                    <li>Plants can perish and habitats start to disappear when ecosystems like marshes or seagrass beds are submerged for extended periods of time.</li>
+
+                    <li>Due to rapidly changing environments (primarily from human interference and development), flooding is becoming increasingly frequent.</li>
+                </ul>
+            </div>
+            <div class="dialogue-image-section">
+                <img id="dialogue-image" src="../media/scene_1/flooding.jpg" alt="Dialogue Image">
+            </div>
         </div>
     </div>
 
-    <audio id="narration-one" src="../media/scene_0/demo_audio_test.mp3"></audio>
+    <div id="dialogue-overlay-2" class="dialogue-overlay">
+        <div class="dialogue-container">
+            <button id="dialogue-close" class="dialogue-close-btn">&times;</button>
+            <div class="dialogue-text-section">
+                <h2>Storm Surge</h2>
+                <ul>
+                    <li>Storm surge occurs when hurricanes produce strong winds that force large amounts of ocean water onto land.</li>
+                    
+                    <li>This can significantly increasing water levels on costal communities and ecosystems, such as many with in Tampa Bay.</li>
+
+                    <li>Because of Tampa Bay's shallow, funnel-shaped geometry, which traps incoming water and exacerbates flooding during storms, storm surge is one of the biggest threats.</li>
+                </ul>
+            </div>
+            <div class="dialogue-image-section">
+                <img id="dialogue-image" src="../media/scene_1/storm_surge.jpg" alt="Dialogue Image">
+            </div>
+        </div>
+    </div>
+
+    <div id="dialogue-overlay-3" class="dialogue-overlay">
+        <div class="dialogue-container">
+            <button id="dialogue-close" class="dialogue-close-btn">&times;</button>
+            <div class="dialogue-text-section">
+                <h2>Climate Change</h2>
+                <ul>
+                    <li>Sea levels are rising and natural weather patterns are being disturbed as a result of climate change's warming of the ocean and atmosphere.</li>
+                    
+                    <li>Warmer oceans supply more energy to storms, making power systems such as hurricanes stronger and more destructive.</li>
+
+                    <li>[MORE INFO]</li>
+                </ul>
+            </div>
+            <div class="dialogue-image-section">
+                <img id="dialogue-image" src="../media/scene_1/climate_change.jpg" alt="Dialogue Image">
+            </div>
+        </div>
+    </div>
+
+    <div id="dialogue-overlay-4" class="dialogue-overlay">
+        <div class="dialogue-container">
+            <button id="dialogue-close" class="dialogue-close-btn">&times;</button>
+            <div class="dialogue-text-section">
+                <h2>Hurricanes</h2>
+                <ul>
+                    <li>Due to climate change, hurricanes are becoming more and more powerful.</li>
+                    
+                    <li>Stronger hurricanes can produce greater storm surge, heavier rainfall, and more severe flooding that damages coastal habitats as well as inland habitats.</li>
+
+                    <li>Scientists have observed that modern hurricanes tend to strengthen faster and last longer, increasing the risk to Tampa Bay’s ecosystems.</li>
+                </ul>
+            </div>
+            <div class="dialogue-image-section">
+                <img id="dialogue-image" src="../media/scene_1/hurricane.png" alt="Dialogue Image">
+            </div>
+        </div>
+    </div>
+
+    <audio id="initial-narration" src="../media/demo_audio_test.mp3"></audio>
+    <audio id="dialogue-narration-1" src="../media/demo_audio_test.mp3"></audio>
+    <audio id="dialogue-narration-2" src="../media/demo_audio_test.mp3"></audio>
+    <audio id="dialogue-narration-3" src="../media/demo_audio_test.mp3"></audio>
+    <audio id="dialogue-narration-4" src="../media/demo_audio_test.mp3"></audio>
     
     <!-- Scripts -->
      <script src="../compiled_js/scene.js"></script>
