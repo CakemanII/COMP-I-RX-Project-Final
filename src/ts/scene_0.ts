@@ -16,7 +16,11 @@ class Scene0 extends Scene {
         this.maxProgress = Object.keys(this.sceneObjectives).length;
 
         this.setupAudioPlaying();
-        this.audioPlayer.play()
+        this.audioPlayer.play();
+    }
+
+    protected startScene(): void {
+        this.audioPlayer.play();
     }
 
     /** 

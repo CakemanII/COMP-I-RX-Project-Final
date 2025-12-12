@@ -20,9 +20,13 @@ class Scene1 extends Scene {
         this.maxProgress = Object.keys(this.sceneObjectives).length;
 
         this.setupAudioPlaying();
-        this.audioPlayer.play()
+        this.audioPlayer.play();
 
         this.initializeButtons();
+    }
+
+    protected startScene(): void { 
+        this.audioPlayer.play(); 
     }
 
     private initializeButtons(): void {
@@ -114,34 +118,31 @@ class Scene1 extends Scene {
      * Setup the audio to play after user interaction
      */
     private setupAudioPlaying(): void {
-        // Get additional elements
-        const infoBox1 = document.getElementById("info-box-1")!;
-        const spaceBarImage = document.getElementById("space-bar-image")!;
-
         this.audioPlayer.setAudioElement(
             "initial-narration", 
             [
                 {
-                    timestamp: 9.5,
+                    timestamp: 1.0,
                     callback: () => {
-                        infoBox1.classList.add("visible");
-                    }
-                },
-                {
-                    timestamp: 24.0,
-                    callback: () => {
-                        // image about tasks to do.
-                    }
-                },
-                {
-                    timestamp: 32.0,
-                    callback: () => {
-                        spaceBarImage.classList.add("visible");
+                        // Show images
+                        const questionImages = document.getElementsByClassName("image-box");
+                        for (let i = 0; i < questionImages.length; i++) {
+                            const img = questionImages[i] as HTMLImageElement;
+                            img.classList.add("visible");
+                        }
                     }
                 }
             ],
             () => {
-                this.updateObjectivesAndProgress("main-narrator-completed");
+                this.updateObjectivesAndProgress("intro-narration-completed");
+
+                // Activate all four question buttons and images
+                const questionButtons = document.getElementsByClassName("invisible-button");
+                for (let i = 0; i < questionButtons.length; i++) {
+                    const button = questionButtons[i] as HTMLButtonElement;
+                    button.classList.add("active");
+                    button.style.display = "block";
+                }
             }
         )
     }

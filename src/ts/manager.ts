@@ -35,7 +35,7 @@ class Manager {
             await UIManager.INSTANCE.waitForInitialization();
             
             // Load the initial scene
-            SceneManager.INSTANCE.loadScene("Scene0");
+            SceneManager.INSTANCE.loadSceneByIndex(0);
             this.updateNavigationButtons();
         });
     }

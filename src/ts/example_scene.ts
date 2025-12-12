@@ -15,6 +15,10 @@ class ExampleScene extends Scene {
         "dragTask2Completed": false
     }
 
+    protected startScene(): void {
+        
+    }
+
     private infoBoxes: HTMLElement[] = [];
 
     constructor() {

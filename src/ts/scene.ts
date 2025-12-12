@@ -10,6 +10,8 @@ abstract class Scene {
 
     protected audioPlayer: SceneAudioPlayer;
 
+    private sceneHasStarted: boolean = false;
+
     constructor() {
         // Initialize Communication
         this.initializeCommunication();
@@ -20,6 +22,13 @@ abstract class Scene {
         // Send initialization finished beacon
         this.sendInitializationFinishedBeacon();
     }
+
+    private start(): void {
+        if (this.sceneHasStarted) { return; }
+        this.sceneHasStarted = true;
+        this.startScene();
+    }
+    protected abstract startScene(): void;
 
     /**
      * Send Initialization finished beacon to Scene Manager
@@ -49,6 +58,7 @@ abstract class Scene {
         // Listen for messages from Scene Manager
         window.addEventListener("message", (event) => {
             // Ensure it is from the parent window
+            console.log("Received message in scene:", event.data);
             if (event.source !== window.parent) {
                 return;
             }
@@ -65,8 +75,16 @@ abstract class Scene {
                 };
                 // Post the message back to the parent window with the secureTransferID
                 window.parent.postMessage({ ...sceneInfo, secureTransferID: message.secureTransferID }, "*");
+            } else if (message.type === "ACTIVATED") {
+                if (!this.sceneHasStarted)
+                    this.start();
+                else 
+                    this.audioPlayer.play();
+            } else if (message.type === "DEACTIVATED") {
+                this.audioPlayer.pause();
             } else if (message.type === "PLAY_AUDIO") {
-                this.audioPlayer.play(); // ?
+                if (this.sceneHasStarted)
+                    this.audioPlayer.play();
             }
         });
     }
@@ -467,6 +485,10 @@ class SceneAudioPlayer {
      * Public method to play audio with error handling
      */
     public play(): void {
+        if (this.audioElement.duration === this.audioElement.currentTime) {
+            console.log("Audio already ended");
+            return;
+        }
         // Attempt to play audio (may be blocked by browser autoplay policy)
         this._play().catch(err => {
             console.log("Autoplay prevented. Requesting parent to prompt user.");

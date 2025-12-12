@@ -54,9 +54,12 @@ class UIManager {
                 this.showAudioPermissionPrompt();
             } else if (event.data.type === "PLAY_AUDIO") {
                 // Forward play audio message to the current scene iframe
-                const currentIframe = document.getElementById(`scene-${SceneManager.INSTANCE.CURRENT_SCENE_INDEX}-iframe`) as HTMLIFrameElement;
-                if (currentIframe && currentIframe.contentWindow) {
-                    currentIframe.contentWindow.postMessage({ type: "PLAY_AUDIO" }, "*");
+                const currentIframe = document.getElementById(
+                    SceneManager.INSTANCE.SCENE_IFRAME_IDS[SceneManager.INSTANCE.CURRENT_SCENE_INDEX]
+                );
+                
+                if (currentIframe && (currentIframe as HTMLIFrameElement).contentWindow) {
+                    (currentIframe as HTMLIFrameElement).contentWindow!.postMessage({ type: "PLAY_AUDIO" }, "*");
                 }
             }
         });

@@ -6,16 +6,11 @@ class SceneManager {
     private static instance: SceneManager;
     public static get INSTANCE(): SceneManager { return this.instance; }
 
-    // Mapping of scene names to their order/index
-    private readonly SCENE_ORDER: { [key: string]: number } = {
-        "Scene0": 0,
-        "Scene1": 1,
-    };
-
     // Mapping of Indexes to scene IFRAME IDs.
-    private readonly SCENE_IFRAME_IDS: { [key: number]: string } = {
+    public readonly SCENE_IFRAME_IDS: { [key: number]: string } = {
         0: "scene-0-iframe",
         1: "scene-1-iframe",
+        2: "scene-2-iframe",
     };
 
     // All IFRAMES loaded flag
@@ -48,21 +43,7 @@ class SceneManager {
      * Get total number of scenes
      */
     public getTotalSceneCount(): number {
-        return Object.keys(this.SCENE_ORDER).length;
-    }
-
-    /**
-     * Load a scene by its index
-     */
-    public async loadSceneByIndex(index: number): Promise<void> {
-        // Find scene name by index
-        for (const sceneName in this.SCENE_ORDER) {
-            if (this.SCENE_ORDER[sceneName] === index) {
-                await this.loadScene(sceneName);
-                return;
-            }
-        }
-        console.error(`No scene found for index: ${index}`);
+        return Object.keys(this.SCENE_IFRAME_IDS).length;
     }
 
     /**
@@ -141,20 +122,17 @@ class SceneManager {
      * Load a specific scene from the DOM, unloading all other scenes.
      * @param sceneName - Name of the scene to load
      */
-    public loadScene(sceneName: string): void {
-        // Get the scene index from the mapping
-        const sceneIndex = this.SCENE_ORDER[sceneName];
-
+    public loadSceneByIndex(sceneIndex: number): void {
         // Ensure the scene exists
         if (sceneIndex === undefined) {
-            console.error(`Scene "${sceneName}" does not exist.`);
+            console.error(`Scene of index "${sceneIndex}" does not exist.`);
             return;
         }
 
         // Show the requested scene's IFRAME element
         const iframeElement = this.sceneIframes[sceneIndex];
         if (!iframeElement) {
-            console.error(`Cannot show IFRAME for scene: ${sceneName}`);
+            console.error(`Cannot show IFRAME for scene with index of: ${sceneIndex}`);
             return;
         }
 
@@ -163,7 +141,15 @@ class SceneManager {
         
         // Load the requested scene
         iframeElement.style.display = "block";
+        iframeElement.style.zIndex = "10";
         this.currentSceneIndex = sceneIndex;
+
+        // Activate the scene by sending a message
+        try {
+            iframeElement.contentWindow?.postMessage({ type: "ACTIVATED" }, "*");
+        } catch (error) {
+            console.error(`Error sending ACTIVATED message to scene of index: ${sceneIndex}`, error);
+        }
 
         // Get and set the current scene information
         UIManager.INSTANCE.sceneChanged();
@@ -173,19 +159,22 @@ class SceneManager {
      * Unload all scenes.
      */
     private unloadAllScenes(): void {
-        // Logic to unload all scenes
-        for (const sceneName in this.SCENE_ORDER) {
-            console.log(`Unloading scene: ${sceneName}`);
-            // Hide the corresponding IFRAME element
-            const sceneIndex = this.SCENE_ORDER[sceneName];
-            const iframeElement = this.sceneIframes[sceneIndex];
-            // Warn if no IFRAME element is found
+        for (const index in this.sceneIframes) {
+            const iframeElement = this.sceneIframes[index];
             if (!iframeElement) {
-                console.warn(`Cannot hide IFRAME for scene: ${sceneName}`);
+                console.warn(`Cannot hide IFRAME for scene: ${index}`);
                 continue;
             }
             // Hide the IFRAME element
             iframeElement.style.display = "none";
+            iframeElement.style.zIndex = "1";
+            
+            // Stop audio in the hidden scene
+            try {
+                iframeElement.contentWindow?.postMessage({ type: "DEACTIVATED" }, "*");
+            } catch (error) {
+                console.error(`Error sending DEACTIVATED message to scene: ${index}`, error);
+            }
         }
     }
 
