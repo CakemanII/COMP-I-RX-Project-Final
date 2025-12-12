@@ -8,9 +8,10 @@ class SceneManager {
 
     // Mapping of Indexes to scene IFRAME IDs.
     public readonly SCENE_IFRAME_IDS: { [key: number]: string } = {
-        0: "scene-0-iframe",
-        1: "scene-1-iframe",
-        2: "scene-2-iframe",
+        0: "scene-3-iframe",
+        1: "scene-0-iframe",
+        2: "scene-1-iframe",
+        3: "scene-2-iframe",
     };
 
     // All IFRAMES loaded flag

@@ -61,7 +61,6 @@ class Scene2 extends Scene {
                 this.updateObjectivesAndProgress("narration-completed");
             }
         )
-        this.audioPlayer.play();
     }
 }
 
