@@ -38,7 +38,6 @@ abstract class Scene {
         const uniqueID = Math.random().toString(36).substring(2) + Date.now().toString(36);
         const interval = setInterval(() => {
             // Notify parent window that scene has loaded
-            console.log("Sending SCENE_LOADED beacon to Scene Manager.");
             window.parent.postMessage({ uniqueID: uniqueID, type: "SCENE_LOADED" }, "*");
         }, 100);
 
@@ -58,7 +57,6 @@ abstract class Scene {
         // Listen for messages from Scene Manager
         window.addEventListener("message", (event) => {
             // Ensure it is from the parent window
-            console.log("Received message in scene:", event.data);
             if (event.source !== window.parent) {
                 return;
             }
@@ -485,6 +483,11 @@ class SceneAudioPlayer {
      * Public method to play audio with error handling
      */
     public play(): void {
+        if (!this.audioElement) {
+            console.warn("Cannot play, Audio element not set.");
+            return;
+        }
+
         if (this.audioElement.duration === this.audioElement.currentTime) {
             console.log("Audio already ended");
             return;

@@ -30,6 +30,7 @@ class Scene0 extends Scene {
         // Get additional elements
         const infoBox1 = document.getElementById("info-box-1")!;
         const spaceBarImage = document.getElementById("space-bar-image")!;
+        const wavingImage = document.getElementById("gator-waving-image")!;
 
         this.audioPlayer.setAudioElement(
             "initial-narration", 
@@ -50,6 +51,12 @@ class Scene0 extends Scene {
                     timestamp: 32.0,
                     callback: () => {
                         spaceBarImage.classList.add("visible");
+                    }
+                },
+                {
+                    timestamp: 40.0,
+                    callback: () => {
+                        wavingImage.classList.add("visible");
                     }
                 }
             ],

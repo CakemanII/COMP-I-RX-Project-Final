@@ -8,10 +8,22 @@ class SceneManager {
 
     // Mapping of Indexes to scene IFRAME IDs.
     public readonly SCENE_IFRAME_IDS: { [key: number]: string } = {
-        0: "scene-3-iframe",
-        1: "scene-0-iframe",
-        2: "scene-1-iframe",
-        3: "scene-2-iframe",
+        0: "scene-0-iframe",
+        1: "scene-1-iframe",
+        2: "scene-2-iframe",
+        3: "scene-3-iframe",
+        4: "scene-4-iframe",
+        5: "scene-5-iframe",
+        6: "scene-6-iframe",
+        7: "scene-7-iframe",
+        8: "scene-8-iframe",
+        9: "scene-9-iframe",
+        10: "scene-10-iframe",
+        11: "scene-11-iframe",
+        12: "scene-12-iframe",
+        13: "scene-13-iframe",
+        14: "scene-14-iframe",
+        15: "scene-15-iframe",
     };
 
     // All IFRAMES loaded flag
@@ -90,7 +102,6 @@ class SceneManager {
             if (messageData && messageData.type === "SCENE_LOADED") {
                 if (loadedIFrames.includes(messageData.uniqueID)) { return; } // Already recorded
                 loadedIFrames.push(messageData.uniqueID);
-                console.log(`Received IFRAME_LOADED message. Total loaded: ${loadedIFrames.length} / ${totalIFrames}`);
                 // Send acknowledgment message back to the IFRAME
                 (event.source as Window).postMessage({ type: "SCENE_LOAD_OK" }, "*");
             }

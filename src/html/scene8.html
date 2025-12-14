@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rising Water Levels Tutorial</title>
+    <link rel="stylesheet" href="../css/scene_styles.css">
+</head>
+<body>
+    <div class="scene-container">
+        <img src="../media/scene8/sc_8_bg.jpg" alt="Scene BG">
+
+        <!-- Question Mark Images in 2x2 Grid -->
+        <div id="question-mark-1" class="image-box" style="top: 70px; left: 200px; width: 160px; height: 160px;">
+            <img src="../media/scene_1/question_mark.png" alt="Question Mark">
+        </div>
+        <div id="question-mark-2" class="image-box" style="top: 70px; right: 200px; width: 160px; height: 160px;">
+            <img src="../media/scene_1/question_mark.png" alt="Question Mark">
+        </div>
+        <div id="question-mark-3" class="image-box" style="bottom: 70px; left: 200px; width: 160px; height: 160px;">
+            <img src="../media/scene_1/question_mark.png" alt="Question Mark">
+        </div>
+        <div id="question-mark-4" class="image-box" style="bottom: 70px; right: 200px; width: 160px; height: 160px;">
+            <img src="../media/scene_1/question_mark.png" alt="Question Mark">
+        </div>
+
+        <!-- Invisible Buttons Over Question Marks -->
+        <div id="question-button-1" class="invisible-button" style="top: 70px; left: 200px; width: 160px; height: 160px; display: none;"></div>
+        <div id="question-button-2" class="invisible-button" style="top: 70px; right: 200px; width: 160px; height: 160px; display: none;"></div>
+        <div id="question-button-3" class="invisible-button" style="bottom: 70px; left: 200px; width: 160px; height: 160px; display: none;"></div>
+        <div id="question-button-4" class="invisible-button" style="bottom: 70px; right: 200px; width: 160px; height: 160px; display: none;"></div>
+    </div>
+
+    <!-- Dialogue Overlay -->
+    <div id="dialogue-overlay-1" class="dialogue-overlay">
+        <div class="dialogue-container">
+            <button id="dialogue-close" class="dialogue-close-btn">&times;</button>
+            <div class="dialogue-text-section">
+                <h2>Shoreline barriers</h2>
+                <ul>
+                    <li>...</li>
+                </ul>
+            </div>
+            <div class="dialogue-image-section">
+                <img id="dialogue-image" src="../media/scene8/beach_rock_barrier.png" alt="Dialogue Image">
+            </div>
+        </div>
+    </div>
+
+    <div id="dialogue-overlay-2" class="dialogue-overlay">
+        <div class="dialogue-container">
+            <button id="dialogue-close" class="dialogue-close-btn">&times;</button>
+            <div class="dialogue-text-section">
+                <h2>Mangrove Natural Barriers</h2>
+                <ul>
+                    <li>...</li>
+                </ul>
+            </div>
+            <div class="dialogue-image-section">
+                <img id="dialogue-image" src="../media/scene8/mangroves.png" alt="Dialogue Image">
+            </div>
+        </div>
+    </div>
+
+    <div id="dialogue-overlay-3" class="dialogue-overlay">
+        <div class="dialogue-container">
+            <button id="dialogue-close" class="dialogue-close-btn">&times;</button>
+            <div class="dialogue-text-section">
+                <h2>Climate Change</h2>
+                <ul>
+                    <li>...</li>
+                </ul>
+            </div>
+            <div class="dialogue-image-section">
+                <img id="dialogue-image" src="../media/scene8/vegetated-swale.jpg" alt="Dialogue Image">
+            </div>
+        </div>
+    </div>
+
+    <div id="dialogue-overlay-4" class="dialogue-overlay">
+        <div class="dialogue-container">
+            <button id="dialogue-close" class="dialogue-close-btn">&times;</button>
+            <div class="dialogue-text-section">
+                <h2>Climate Change</h2>
+                <ul>
+                    <li>...</li>
+                </ul>
+            </div>
+            <div class="dialogue-image-section">
+                <img id="dialogue-image" src="../media/scene8/salt_marshes.png" alt="Dialogue Image">
+            </div>
+        </div>
+    </div>
+
+    <audio id="initial-narration" src="../media/demo_audio_test.mp3" paused></audio>
+    <audio id="dialogue-narration-1" src="../media/demo_audio_test.mp3" paused></audio>
+    <audio id="dialogue-narration-2" src="../media/demo_audio_test.mp3" paused></audio>
+    <audio id="dialogue-narration-3" src="../media/demo_audio_test.mp3" paused></audio>
+    <audio id="dialogue-narration-4" src="../media/demo_audio_test.mp3" paused></audio>
+    
+    <!-- Scripts -->
+     <script src="../compiled_js/scene.js"></script>
+     <script src="../compiled_js/scene8.js"></script>
+</body>
+</html>
