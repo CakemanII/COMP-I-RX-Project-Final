@@ -111,6 +111,15 @@ img {
     margin: 0;
 }
 
+.info-box a {
+    color: #006064;
+    text-decoration: underline;
+}
+
+.info-box a:visited {
+    color: #004d40;
+}
+
 .info-box ul,
 .info-box ol {
     margin: 8px 0;

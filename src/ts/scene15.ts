@@ -2,8 +2,8 @@
  * Start Menu
  */
 class Scene15 extends Scene {
-    protected directoryHeader: string = "References";
-    protected sceneName: string = "References";
+    protected directoryHeader: string = "Sources & Credits";
+    protected sceneName: string = "References and Credits";
 
     protected sceneObjectives: { [key: string]: boolean } = {
         "done": false,
@@ -15,7 +15,7 @@ class Scene15 extends Scene {
 
     constructor() {
         super();
-        
+
         // Set max progress
         this.maxProgress = Object.keys(this.sceneObjectives).length;
     }

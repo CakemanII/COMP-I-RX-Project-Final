@@ -6,6 +6,8 @@ class UIManager {
     private static instance: UIManager;
     public static get INSTANCE(): UIManager { return this.instance; }
 
+    private _activateAllScenes: boolean = true;
+
     // Static HTML Element IDs & References
     private readonly DIRECTORY_ID: string = "directory-list";
     private directoryElement!: HTMLElement;
@@ -127,7 +129,18 @@ class UIManager {
 
         // Lock all other scenes initially
         for (let i = 1; i < this.directoryItems.length; i++) {
-            this.directoryItems[i].classList.add("directory-locked");
+            if (!this._activateAllScenes) {
+                this.directoryItems[i].classList.add("directory-locked");
+            }
+            else
+            {
+                this.directoryItems[i].classList.add("directory-unlocked");
+            }
+        }
+
+        // If activating all scenes, tell Manager to make them all accessible
+        if (this._activateAllScenes) {
+            Manager.INSTANCE.unlockAllScenes();
         }
 
         this.finishedInitializing = true;

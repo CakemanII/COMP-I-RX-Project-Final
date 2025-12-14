@@ -111,8 +111,16 @@ class Manager {
         return sceneIndex <= this.maxCompletedSceneIndex + 1;
     }
 
-    /**
-     * Navigate to a specific scene by index
+    /**     * Unlock all scenes (for development/testing)
+     */
+    public unlockAllScenes(): void {
+        const totalScenes = SceneManager.INSTANCE.getTotalSceneCount();
+        this.maxCompletedSceneIndex = totalScenes - 1;
+        this.updateNavigationButtons();
+        UIManager.INSTANCE.updateDirectoryAccessibility();
+    }
+
+    /**     * Navigate to a specific scene by index
      */
     public async goToScene(sceneIndex: number): Promise<void> {
         const currentSceneIndex = SceneManager.INSTANCE.CURRENT_SCENE_INDEX;
