@@ -113,7 +113,7 @@ class Scene9 extends Scene {
 
         // Play audio if clicking for the first time
         this.audioPlayer.setAudioElement(
-            "narration-one",
+            `dialogue-narration-${button_index + 1}`,
             [],
             () => { 
                 this.enableInteractions();

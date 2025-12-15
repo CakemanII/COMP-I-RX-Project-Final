@@ -2,7 +2,7 @@
  * Start Menu
  */
 class Scene3 extends Scene {
-    protected directoryHeader: string = "Ecosystem: Backyard Habitats";
+    protected directoryHeader: string = "Habitat: Backyard Habitat";
     protected sceneName: string = "Backyard Habitats in Tampa Bay"
 
     protected sceneObjectives: { [key: string]: boolean } = {
@@ -77,7 +77,7 @@ class Scene3 extends Scene {
 
         // Play audio if clicking for the first time
         this.audioPlayer.setAudioElement(
-            "info-1-narration",
+            `dialogue-narration-${button_index + 1}`,
             [],
             () => { 
                 this.enableInteractions();

@@ -2,7 +2,7 @@
  * Start Menu
  */
 class Scene4 extends Scene {
-    protected directoryHeader: string = "Ecosystems: Beach & Sandy Shorelines";
+    protected directoryHeader: string = "Habitats: Beach & Sandy Shoreline";
     protected sceneName: string = "Beach & Sandy Shoreline Habitats in Tampa Bay"
 
     protected sceneObjectives: { [key: string]: boolean } = {
@@ -77,7 +77,7 @@ class Scene4 extends Scene {
 
         // Play audio if clicking for the first time
         this.audioPlayer.setAudioElement(
-            "info-1-narration",
+            `dialogue-narration-${button_index + 1}`,
             [],
             () => { 
                 this.enableInteractions();

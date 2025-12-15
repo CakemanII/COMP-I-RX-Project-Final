@@ -2,7 +2,7 @@
  * Start Menu
  */
 class Scene5 extends Scene {
-    protected directoryHeader: string = "Ecosystems: Freshwater Marshes";
+    protected directoryHeader: string = "Habitats: Marine";
     protected sceneName: string = "Freshwater Marsh Habitats in Tampa Bay"
 
     protected sceneObjectives: { [key: string]: boolean } = {
@@ -77,7 +77,7 @@ class Scene5 extends Scene {
 
         // Play audio if clicking for the first time
         this.audioPlayer.setAudioElement(
-            "info-1-narration",
+            `dialogue-narration-${button_index + 1}`,
             [],
             () => { 
                 this.enableInteractions();

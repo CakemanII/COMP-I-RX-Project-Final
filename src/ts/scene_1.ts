@@ -20,7 +20,6 @@ class Scene1 extends Scene {
         this.maxProgress = Object.keys(this.sceneObjectives).length;
 
         this.setupAudioPlaying();
-        this.audioPlayer.play();
 
         this.initializeButtons();
     }
@@ -118,6 +117,7 @@ class Scene1 extends Scene {
      * Setup the audio to play after user interaction
      */
     private setupAudioPlaying(): void {
+        console.log("Setting up initial narration audio");
         this.audioPlayer.setAudioElement(
             "initial-narration", 
             [
