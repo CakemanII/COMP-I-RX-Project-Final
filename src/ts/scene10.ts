@@ -122,7 +122,7 @@ class Scene10 extends Scene {
             "initial-narration", 
             [
                 {
-                    timestamp: 1.0,
+                    timestamp: 3.4,
                     callback: () => {
                         // Show images
                         const questionImages = document.getElementsByClassName("image-box");

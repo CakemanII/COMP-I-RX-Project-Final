@@ -27,19 +27,19 @@ class Scene13 extends Scene {
             "initial-narration", 
             [
                 {
-                    timestamp: 0.5,
+                    timestamp: 0.75,
                     callback: () => {
                         infoBox1.classList.add("visible");
                     },
                 },
                 {
-                    timestamp: 5.0,
+                    timestamp: 29.0,
                     callback: () => {
                         infoBox2.classList.add("visible");
                     },
                 },
                 {
-                    timestamp: 10.0,
+                    timestamp: 29.0+27.2,
                     callback: () => {
                         infoBox3.classList.add("visible");
                     },

@@ -31,29 +31,29 @@ class Scene2 extends Scene {
             "initial-narration", 
             [
                 {
-                    timestamp: 0.5,
+                    timestamp: 8.0,
                     callback: () => {
                         infoBox1.classList.add("visible");
                     }
                 },
                 {
-                    timestamp: 1.0,
+                    timestamp: 18.5,
                     callback: () => {
+                        imageBox3.classList.add("visible");
+                    }
+                },
+                {
+                    timestamp: 20.0,
+                    callback: () => {
+                        // Show info box
                         imageBox1.classList.add("visible");
                     }
                 },
                 {
-                    timestamp: 2.0,
+                    timestamp: 22.0,
                     callback: () => {
                         // Show info box
                         imageBox2.classList.add("visible");
-                    }
-                },
-                {
-                    timestamp: 3.0,
-                    callback: () => {
-                        // Show info box
-                        imageBox3.classList.add("visible");
                     }
                 }
             ],

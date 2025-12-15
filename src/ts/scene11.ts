@@ -19,7 +19,6 @@ class Scene11 extends Scene {
         // Set max progress
         this.maxProgress = Object.keys(this.sceneObjectives).length;
 
-        const infoBox1 = document.getElementById("info-box-1")!;
         const imageBox1 = document.getElementById("image-box-1")!;
         const imageBox2 = document.getElementById("image-box-2")!;
 
@@ -27,19 +26,13 @@ class Scene11 extends Scene {
             "initial-narration", 
             [
                 {
-                    timestamp: 0.5,
-                    callback: () => {
-                        infoBox1.classList.add("visible");
-                    },
-                },
-                {
-                    timestamp: 5.0,
+                    timestamp: 13.5,
                     callback: () => {
                         imageBox1.classList.add("visible");
                     },
                 },
                 {
-                    timestamp: 10.0,
+                    timestamp: 2.5,
                     callback: () => {
                         imageBox2.classList.add("visible");
                     },

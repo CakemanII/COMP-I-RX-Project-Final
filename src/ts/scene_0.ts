@@ -42,19 +42,13 @@ class Scene0 extends Scene {
                     }
                 },
                 {
-                    timestamp: 24.0,
-                    callback: () => {
-                        // image about tasks to do.
-                    }
-                },
-                {
                     timestamp: 32.0,
                     callback: () => {
                         spaceBarImage.classList.add("visible");
                     }
                 },
                 {
-                    timestamp: 40.0,
+                    timestamp: 46.0,
                     callback: () => {
                         wavingImage.classList.add("visible");
                     }

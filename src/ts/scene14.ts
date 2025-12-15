@@ -26,15 +26,15 @@ class Scene14 extends Scene {
             "initial-narration", 
             [
                 {
-                    timestamp: 0.5,
+                    timestamp: 3.2,
                     callback: () => {
-                        imageBox1.classList.add("visible");
+                        imageBox2.classList.add("visible");
                     },
                 },
                 {
-                    timestamp: 5.0,
+                    timestamp: 14.3,
                     callback: () => {
-                        imageBox2.classList.add("visible");
+                        imageBox1.classList.add("visible");
                     },
                 },
             ],

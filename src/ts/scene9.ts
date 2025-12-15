@@ -27,28 +27,15 @@ class Scene9 extends Scene {
         this.initializeButtons();
         this.disableInteractions();
 
-        const button1 = document.getElementById("button-1")!;
-        const button2 = document.getElementById("button-2")!;
-        const button3 = document.getElementById("button-3")!;
-        
-        // Hide buttons initially
-        button1.style.display = "none";
-        button2.style.display = "none";
-        button3.style.display = "none";
+        const infobox0 = document.getElementById("info-box-0")!;
 
         this.audioPlayer.setAudioElement(
             "initial-narration",
             [
                 {
-                    timestamp: 0.5,
+                    timestamp: 5.0,
                     callback: () => {
-                        // Show buttons with fade in animation
-                        button1.style.display = "flex";
-                        button2.style.display = "flex";
-                        button3.style.display = "flex";
-                        button1.style.animation = "fadeIn 0.3s ease-out";
-                        button2.style.animation = "fadeIn 0.3s ease-out";
-                        button3.style.animation = "fadeIn 0.3s ease-out";
+                        infobox0.classList.add("visible");
                     }
                 }
             ],
