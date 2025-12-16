@@ -6,7 +6,7 @@ class UIManager {
     private static instance: UIManager;
     public static get INSTANCE(): UIManager { return this.instance; }
 
-    private _activateAllScenes: boolean = false;
+    private _activateAllScenes: boolean = true;
 
     // Static HTML Element IDs & References
     private readonly DIRECTORY_ID: string = "directory-list";
